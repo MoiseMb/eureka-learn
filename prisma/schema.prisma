@@ -1,0 +1,73 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id           String      @id @default(auto()) @map("_id") @db.ObjectId
+    firstName    String?
+    lastName     String?
+    email        String      @unique
+    password     String
+    role         Role        @default(USER)
+    departmentId String?     @db.ObjectId
+    department   Department? @relation(fields: [departmentId], references: [id])
+    createdAt    DateTime    @default(now())
+    updatedAt    DateTime    @updatedAt
+    requests     Request[]
+    Direction    Direction[]
+}
+
+model Department {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    name      String
+    managerId String?  @db.ObjectId
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    users     User[]
+}
+
+model Direction {
+    id              String    @id @default(auto()) @map("_id") @db.ObjectId
+    name            String
+    plannedRevenue  Float
+    plannedExpenses Float
+    managerId       String    @db.ObjectId
+    manager         User      @relation(fields: [managerId], references: [id])
+    requests        Request[]
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+}
+
+model Request {
+    id          String        @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    description String?
+    quantity    Int
+    unitPrice   Float
+    totalAmount Float
+    category    String
+    status      RequestStatus @default(PENDING)
+    userId      String        @db.ObjectId
+    user        User          @relation(fields: [userId], references: [id])
+    directionId String?       @db.ObjectId
+    direction   Direction?    @relation(fields: [directionId], references: [id])
+    createdAt   DateTime      @default(now())
+    updatedAt   DateTime      @updatedAt
+}
+
+enum Role {
+    SUPER_ADMIN
+    ADMIN_DPT
+    USER
+}
+
+enum RequestStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
