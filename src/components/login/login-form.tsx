@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "../mode-toggle";
-import { Loader2 } from "lucide-react"; // Add this import
+import { Loader2 } from "lucide-react"; 
 
 export function LoginForm({
   className,
@@ -27,7 +27,7 @@ export function LoginForm({
     password: ""
   });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +48,7 @@ export function LoginForm({
     } catch (error: any) {
       setError(error.message || "Une erreur est survenue");
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false); 
     }
   };
 
@@ -64,23 +64,23 @@ export function LoginForm({
         <ModeToggle />
       </div>
       <div className="absolute top-8 right-8 ">
-        <span className="text-teal-600 font-semibold md:text-3xl text-lg">
-          EduBudget
+        <span className="text-blue-600 font-semibold md:text-3xl text-lg">
+          Edu
         </span>
-        <span className="ml-2 bg-teal-600 text-white px-2 py-1 rounded  md:text-2xl text-md">
-          Pro
+        <span className="ml-2 bg-blue-600 text-white px-2 py-1 rounded  md:text-2xl text-md">
+          SQL
         </span>
       </div>
 
       <div className="absolute inset-0 md:top-32 top-[20%] flex items-start justify-center">
-        <span className="md:text-[300px] text-[70px] font-bold text-teal-500/10">
-          Bienvenue !
+        <span className="md:text-[300px] text-[70px] font-bold text-blue-800/10">
+          Bienvenue
         </span>
       </div>
 
       <div className="flex w-full flex-col items-center justify-center  flex-1 md:z-10">
         <div className="w-full justify-center items-center flex flex-col">
-          <h1 className="md:text-8xl text-4xl font-semibold text-teal-600 mb-8">
+          <h1 className="md:text-8xl text-4xl font-semibold text-blue-400 mb-8">
             Connectez vous
           </h1>
           {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -114,7 +114,7 @@ export function LoginForm({
             </div>
             <Button
               type="submit"
-              className="w-full h-12 bg-teal-600 hover:bg-teal-700 text-white py-3"
+              className="w-full h-12 bg-blue-400 hover:bg-blue-700 text-white py-3"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -127,7 +127,7 @@ export function LoginForm({
               )}
             </Button>
             <div className="text-center">
-              <a href="#" className="text-teal-600 hover:underline">
+              <a href="#" className="text-blue-700 hover:underline">
                 Mot de passe oublié ?
               </a>
             </div>
