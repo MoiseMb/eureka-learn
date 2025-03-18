@@ -1,18 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { signOut } from "next-auth/react";
-import Link from "next/link";
-import { LayoutGrid, User } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  TooltipProvider
-} from "@/components/ui/tooltip";
+import { useSession, signOut } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,21 +11,16 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { useState } from "react";
-import { LogOut, AlertCircle } from "lucide-react";
+import { AlertDialog } from "../ui/alert-dialog";
+import { User, LayoutGrid } from "lucide-react";
 
 export function UserNav() {
   const { data: session } = useSession();
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
-  const [open, setOpen] = useState(false); // Add this state for dropdown
+  const [open, setOpen] = useState(false);
 
   const getInitials = () => {
     if (session?.user?.firstName && session?.user?.lastName) {
@@ -55,41 +38,29 @@ export function UserNav() {
 
   const translateRole = (role: string) => {
     const roles = {
-      SUPER_ADMIN: " Administrateur",
-      ADMIN_DPT: "Responsable Département",
-      USER: "Personnel"
+      PROFESSOR: "Professeur",
+      STUDENT: "Étudiant",
+      ADMIN: "Administrateur"
     };
     return roles[role as keyof typeof roles] || role;
   };
-
-  const handleSignOut = () => {
-    setShowSignOutDialog(false);
-    signOut({ callbackUrl: "/login" });
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/login" });
   };
 
   return (
     <>
       <DropdownMenu open={open} onOpenChange={setOpen}>
-        <TooltipProvider disableHoverableContent>
-          <Tooltip delayDuration={100}>
-            <TooltipTrigger asChild>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt={getFullName()} />
-                    <AvatarFallback className="bg-teal-500 text-white">
-                      {getInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Profile</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="relative h-8 w-8 rounded-full bg-blue-500 text-white"
+          >
+            <div className="relative flex h-full w-full items-center justify-center rounded-full bg-muted">
+              {getInitials()}
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
 
         <DropdownMenuContent className="w-56" align="end" forceMount>
           <DropdownMenuLabel className="font-normal">
@@ -107,25 +78,24 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem className="hover:cursor-pointer" asChild>
+            <DropdownMenuItem asChild>
               <Link href="/dashboard" className="flex items-center">
-                <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
-                Acceuil
+                <LayoutGrid className="w-4 h-4 mr-3" />
+                Tableau de bord
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:cursor-pointer" asChild>
+            <DropdownMenuItem asChild>
               <Link href="/account" className="flex items-center">
-                <User className="w-4 h-4 mr-3 text-muted-foreground" />
-                Profile
+                <User className="w-4 h-4 mr-3" />
+                Mon profil
               </Link>
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-red-600"
-            onClick={(e) => {
-              e.stopPropagation();
-              setOpen(false); // Close dropdown
+            className="text-red-600 cursor-pointer"
+            onClick={() => {
+              setOpen(false);
               setShowSignOutDialog(true);
             }}
           >
@@ -135,45 +105,15 @@ export function UserNav() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog
-        open={showSignOutDialog}
-        onOpenChange={(open) => {
-          setShowSignOutDialog(open);
-          if (!open) setOpen(false); // Ensure dropdown is closed when dialog closes
-        }}
-      >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="space-y-3">
-            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-100/80">
-              <AlertCircle className="h-10 w-10 text-red-600" />
-            </div>
-            <DialogTitle className="text-center text-xl">
-              Confirmation de déconnexion
-            </DialogTitle>
-            <DialogDescription className="text-center text-base">
-              Vous êtes sur le point de vous déconnecter de votre session.
-              Voulez-vous continuer ?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex items-center gap-2 sm:justify-center mt-6">
-            <Button
-              variant="outline"
-              onClick={() => setShowSignOutDialog(false)}
-              className="h-14 text-lg mr-8"
-            >
-              Annuler
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleSignOut}
-              className="h-14 text-lg"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Déconnecter
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AlertDialog
+        isOpen={showSignOutDialog}
+        onClose={() => setShowSignOutDialog(false)}
+        title="Se déconnecter"
+        description="Êtes-vous sûr de vouloir vous déconnecter ?"
+        onConfirm={handleLogout}
+        confirmText="Se déconnecter"
+        cancelText="Annuler"
+      />
     </>
   );
 }

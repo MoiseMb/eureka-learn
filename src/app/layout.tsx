@@ -3,9 +3,8 @@ import { GeistSans } from "geist/font/sans";
 
 import "./globals.css";
 
-import { ThemeProvider } from "@/components/providers/theme-provider";
-import { NextAuthProvider } from "./providers/NextAuthProvider";
 import { Toaster } from "sonner";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -30,11 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
-        <NextAuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            {children}
-          </ThemeProvider>
-        </NextAuthProvider>
+        <Providers>{children}</Providers>
         <Toaster richColors position="top-right" />
       </body>
     </html>

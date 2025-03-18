@@ -1,12 +1,11 @@
 import {
-  Tag,
   Users,
+  GraduationCap,
+  School,
+  ClipboardList,
+  LayoutDashboard,
   Settings,
-  Bookmark,
-  SquarePen,
-  LayoutGrid,
-  LucideIcon,
-  Building
+  LucideIcon
 } from "lucide-react";
 
 type Submenu = {
@@ -29,56 +28,100 @@ type Group = {
 };
 
 export function getMenuList(pathname: string, role?: string): Group[] {
-  const isSuperAdmin = role === "SUPER_ADMIN";
-  const isDepartementLeader = role === "ADMIN_DPT";
-
-  const departmentLeader = isDepartementLeader ? [
+  // Menus communs à tous les rôles
+  const commonMenus = [
     {
-      href: "/users",
-      label: "Personnels",
-      icon: Users
-    }
-  ] : [];
-
-  const adminMenus = isSuperAdmin ? [
-    {
-      href: "/departments",
-      label: "Départements",
-      icon: Building
-    },
-    {
-      href: "/department-managers",
-      label: "Responsable Departement ",
-      icon: Users
-    }
-  ] : [];
-
-  return [
-    {
-      groupLabel: "",
+      groupLabel: "Principal",
       menus: [
         {
           href: "/dashboard",
-          label: "Acceuil",
-          icon: LayoutGrid,
-          submenus: []
+          label: "Tableau de bord",
+          icon: LayoutDashboard,
         }
       ]
-    },
-    {
-      groupLabel: "",
-      menus: [
-        {
-          href: "/requests",
-          label: "Demande",
-          icon: LayoutGrid,
-          submenus: []
-        }
-      ]
-    },
-    {
-      groupLabel: isSuperAdmin ? "Administration" : isDepartementLeader ? "Compte" : '',
-      menus: isSuperAdmin ? adminMenus : isDepartementLeader ? departmentLeader : []
     }
   ];
+
+
+  const adminMenus = [
+    {
+      groupLabel: "Administration",
+      menus: [
+        {
+          href: "/admin/student",
+          label: "Élèves",
+          icon: Users
+        },
+        {
+          href: "/admin/classrom",
+          label: "Classes",
+          icon: School
+        },
+        {
+          href: "/admin/professor",
+          label: "Professeurs",
+          icon: GraduationCap
+        }
+      ]
+    }
+  ];
+
+  // Menus spécifiques aux professeurs
+  const professorMenus = [
+    {
+      groupLabel: "Gestion",
+      menus: [
+        {
+          href: "/my-classes",
+          label: "Mes Classes",
+          icon: School
+        },
+        {
+          href: "/my-evaluations",
+          label: "Évaluations",
+          icon: ClipboardList,
+          submenus: [
+            {
+              href: "/my-evaluations/create",
+              label: "Créer une évaluation"
+            },
+            {
+              href: "/my-evaluations/list",
+              label: "Liste des évaluations"
+            }
+          ]
+        }
+      ]
+    }
+  ];
+
+  // Menus spécifiques aux élèves
+  const studentMenus = [
+    {
+      groupLabel: "Mon Espace",
+      menus: [
+        {
+          href: "/my-evaluations",
+          label: "Mes Évaluations",
+          icon: ClipboardList
+        },
+        {
+          href: "/my-results",
+          label: "Mes Résultats",
+          icon: School
+        }
+      ]
+    }
+  ];
+
+  switch (role) {
+    case "ADMIN":
+      return [...commonMenus, ...adminMenus];
+    case "PROFESSOR":
+      return [...commonMenus, ...professorMenus];
+    case "STUDENT":
+      return [...commonMenus, ...studentMenus];
+    default:
+      return commonMenus;
+  }
 }

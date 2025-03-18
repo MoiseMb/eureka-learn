@@ -5,17 +5,9 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ModeToggle } from "../mode-toggle";
-import { Loader2 } from "lucide-react"; 
+import { Loader2 } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -27,7 +19,7 @@ export function LoginForm({
     password: ""
   });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +40,7 @@ export function LoginForm({
     } catch (error: any) {
       setError(error.message || "Une erreur est survenue");
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 

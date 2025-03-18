@@ -34,10 +34,9 @@ export function Sidebar() {
           asChild
         >
           <Link href="/dashboard" className="flex items-center gap-2">
-            {/* <PanelsTopLeft className="w-6 h-6 mr-1" /> */}
             {!isOpen && (
-              <span className="ml-2 bg-teal-600 text-white px-1 py-1 rounded  md:text-lg text-md">
-                Pro
+              <span className=" bg-blue-500 text-white  py-1 rounded  md:text-xl text-md px-2">
+                EL
               </span>
             )}
             <h1
@@ -49,11 +48,11 @@ export function Sidebar() {
               )}
             >
               <div className=" top-8 right-8 ">
-                <span className="text-teal-600 font-semibold md:text-xl text-lg">
-                  EduBudget
+                <span className="text-blue-500 font-semibold md:text-xl text-lg">
+                  EUREKA
                 </span>
-                <span className="ml-2 bg-teal-600 text-white px-2 py-1 rounded  md:text-lg text-md">
-                  Pro
+                <span className="ml-2 bg-blue-500 text-white px-2 py-1 rounded  md:text-lg text-md">
+                  LEARN
                 </span>
               </div>
             </h1>
