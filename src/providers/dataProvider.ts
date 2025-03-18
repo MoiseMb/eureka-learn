@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
-// import { useSearch } from "./SearchProvider";
 import api from "@/lib/axios";
 
 export type ListParams = {
