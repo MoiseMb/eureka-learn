@@ -4,18 +4,29 @@ export enum Role {
     ADMIN = "ADMIN"
 }
 
+export enum EvaluationType {
+    POO_JAVA = "POO_JAVA",
+    C_LANGUAGE = "C_LANGUAGE",
+    SQL = "SQL",
+    PYTHON = "PYTHON",
+    ALGORITHMS = "ALGORITHMS",
+    DATA_STRUCTURES = "DATA_STRUCTURES"
+}
+
 export type User = {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     role: Role;
     createdAt: Date;
     updatedAt: Date;
-    classroomId?: number;
     subjects?: Subject[];
     submissions?: Submission[];
     classroom?: Classroom;
+    classroomId?: number;
+    teaching?: Classroom[];
 }
 
 export type Subject = {
@@ -25,10 +36,11 @@ export type Subject = {
     fileUrl: string;
     startDate: Date;
     endDate: Date;
+    evaluationType: EvaluationType;
+    teacher: User;
     teacherId: number;
     createdAt: Date;
     updatedAt: Date;
-    teacher?: User;
     submissions?: Submission[];
 }
 
@@ -36,10 +48,10 @@ export type Submission = {
     id: number;
     fileUrl: string;
     submittedAt: Date;
+    student: User;
     studentId: number;
+    subject: Subject;
     subjectId: number;
-    student?: User;
-    subject?: Subject;
     correction?: Correction;
 }
 
@@ -48,8 +60,9 @@ export type Correction = {
     score?: number;
     correctedAt: Date;
     notes?: string;
+    evaluationType: EvaluationType;
+    submission: Submission;
     submissionId: number;
-    submission?: Submission;
 }
 
 export type Classroom = {
@@ -59,4 +72,6 @@ export type Classroom = {
     createdAt: Date;
     updatedAt: Date;
     students?: User[];
+    teacher?: User | null;
+    teacherId?: number | null;
 } 

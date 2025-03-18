@@ -60,12 +60,12 @@ export function ProfessorDrawer({
                 Classes
               </h3>
               <Separator className="my-2" />
-              {/* <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
                 <Badge variant="secondary" className="rounded-full">
-                  {professor.classrooms?.length || 0} classes
+                  {professor.teaching?.length || 0} classes
                 </Badge>
-              </div> */}
+              </div>
             </div>
 
             <div className="space-y-1">
@@ -85,14 +85,14 @@ export function ProfessorDrawer({
               </div>
             </div>
 
-            {/* {professor.classrooms && professor.classrooms.length > 0 && (
+            {professor.teaching && professor.teaching.length > 0 && (
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-muted-foreground">
                   Liste des classes
                 </h3>
                 <Separator className="my-2" />
                 <div className="grid gap-2">
-                  {professor.classrooms.map((classroom: Classroom) => (
+                  {professor.teaching.map((classroom: Classroom) => (
                     <div
                       key={classroom.id}
                       className="flex items-center gap-2 p-2 rounded-lg border bg-card"
@@ -103,7 +103,7 @@ export function ProfessorDrawer({
                   ))}
                 </div>
               </div>
-            )} */}
+            )}
           </div>
         </ScrollArea>
 

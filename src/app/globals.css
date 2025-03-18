@@ -58,3 +58,53 @@
     --chart-5: 340 75% 55%;
   }
 }
+
+/* Styles DatePicker */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+
+.react-datepicker {
+  @apply bg-popover border border-border rounded-md shadow-md !important;
+}
+
+.react-datepicker-popper {
+  @apply z-50 !important;
+}
+
+.react-datepicker__header {
+  @apply bg-muted border-border !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker__time-name {
+  @apply text-foreground !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__time-list-item--selected {
+  @apply !bg-primary !text-primary-foreground hover:!bg-primary/90 !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  @apply !bg-accent !text-accent-foreground hover:!bg-accent/90 !important;
+}
+
+.react-datepicker__day:hover,
+.react-datepicker__time-list-item:hover {
+  @apply !bg-accent !text-accent-foreground !important;
+}
+
+.react-datepicker__time-container {
+  @apply !border-l !border-border;
+}
+
+.react-datepicker__time-list {
+  @apply !bg-popover;
+}
+
+.react-datepicker__time-list-item {
+  @apply !text-foreground hover:!bg-accent hover:!text-accent-foreground;
+}

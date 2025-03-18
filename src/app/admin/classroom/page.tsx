@@ -112,21 +112,32 @@ export default function ClassroomPage() {
   const columns = [
     {
       accessorKey: "name",
-      header: "Nom de la classe",
+      header: "Nom",
       cell: (row: any) => (
-        <div
-          className="flex items-center gap-2 cursor-pointer hover:text-blue-500"
-          onClick={(e) => {
-            e.stopPropagation();
-            setSelectedClassroom(row.original);
-            setIsDrawerOpen(true);
-          }}
-        >
+        <div className="flex items-center gap-2">
           <GraduationCap className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium">{row.name}</span>
+          <span>{row.name}</span>
         </div>
-      ),
-      sortable: true
+      )
+    },
+    {
+      accessorKey: "teacher",
+      header: "Professeur ",
+      cell: (row: any) => {
+        const teacher = row.teacher;
+        return (
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-muted-foreground" />
+            {teacher ? (
+              <Badge variant="secondary">
+                {teacher.firstName} {teacher.lastName}
+              </Badge>
+            ) : (
+              <span className="text-muted-foreground">Non assigné</span>
+            )}
+          </div>
+        );
+      }
     },
     {
       accessorKey: "description",

@@ -28,7 +28,6 @@ type Group = {
 };
 
 export function getMenuList(pathname: string, role?: string): Group[] {
-  // Menus communs à tous les rôles
   const commonMenus = [
     {
       groupLabel: "Principal",
@@ -53,7 +52,7 @@ export function getMenuList(pathname: string, role?: string): Group[] {
           icon: Users
         },
         {
-          href: "/admin/classrom",
+          href: "/admin/classroom",
           label: "Classes",
           icon: School
         },
@@ -66,13 +65,12 @@ export function getMenuList(pathname: string, role?: string): Group[] {
     }
   ];
 
-  // Menus spécifiques aux professeurs
   const professorMenus = [
     {
       groupLabel: "Gestion",
       menus: [
         {
-          href: "/my-classes",
+          href: "/professor/classroom",
           label: "Mes Classes",
           icon: School
         },
@@ -82,7 +80,7 @@ export function getMenuList(pathname: string, role?: string): Group[] {
           icon: ClipboardList,
           submenus: [
             {
-              href: "/my-evaluations/create",
+              href: "evaluation/create",
               label: "Créer une évaluation"
             },
             {

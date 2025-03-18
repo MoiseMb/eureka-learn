@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { User, Role } from "@/types/entities";
+import { User, Role, Classroom } from "@/types/entities";
 import { useDeleteResource, useGetList } from "@/providers/dataProvider";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import { DataTable } from "@/components/ui/data-table/data-table";
@@ -126,14 +126,24 @@ export default function ProfessorsPage() {
       header: "Email"
     },
     {
-      accessorKey: "subjects",
-      header: "Matières",
+      accessorKey: "teaching",
+      header: "Classes",
       cell: (row: any) => {
-        const subjects = row.subjects || [];
+        const teaching = row.teaching || [];
         return (
           <div className="flex items-center gap-2">
             <Book className="h-4 w-4 text-muted-foreground" />
-            <Badge variant="secondary">{subjects.length} matières</Badge>
+            {teaching.length > 0 ? (
+              <div className="flex gap-1">
+                {teaching.map((classroom: Classroom) => (
+                  <Badge key={classroom.id} variant="secondary">
+                    {classroom.name}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <span className="text-muted-foreground">Aucune classe</span>
+            )}
           </div>
         );
       }
