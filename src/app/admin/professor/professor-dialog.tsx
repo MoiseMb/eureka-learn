@@ -1,19 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useCreateResource, useUpdateResource } from "@/providers/dataProvider";
-import { User, Role } from "@/types/entities";
+import { useCreateResource, useUpdateResource, useGetList } from "@/providers/dataProvider";
+import { User, Role, Classroom } from "@/types/entities";
 
 interface ProfessorDialogProps {
   professor: User | null;
@@ -32,9 +27,16 @@ export function ProfessorDialog({
     firstName: "",
     lastName: "",
     email: "",
-    password: ""
+    password: "",
+    teaching: [] as number[]
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: classroomsData } = useGetList("classroom", {
+    limit: 100,
+    page: 1
+  });
+  const classrooms = classroomsData?.data ?? [];
 
   const { mutateAsync: createProfessor } = useCreateResource("user");
   const { mutateAsync: updateProfessor } = useUpdateResource("user");
@@ -45,14 +47,16 @@ export function ProfessorDialog({
         firstName: professor.firstName,
         lastName: professor.lastName,
         email: professor.email,
-        password: ""
+        password: "",
+        teaching: professor.teaching?.map(c => c.id) || []
       });
     } else {
       setFormData({
         firstName: "",
         lastName: "",
         email: "",
-        password: ""
+        password: "",
+        teaching: []
       });
     }
   }, [professor, isOpen]);
@@ -158,6 +162,29 @@ export function ProfessorDialog({
               placeholder="Mot de passe du professeur"
               required={!professor}
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Classes enseignées</Label>
+            <Select
+              value={formData.teaching.join(",")}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  teaching: value.split(",").map(Number).filter(Boolean)
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner les classes" />
+              </SelectTrigger>
+              <SelectContent>
+                {classrooms.map((classroom: Classroom) => (
+                  <SelectItem key={classroom.id} value={classroom.id.toString()}>
+                    {classroom.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <DialogFooter>
             <Button

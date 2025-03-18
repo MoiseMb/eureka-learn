@@ -21,9 +21,15 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { DateTimePicker } from "@/components/ui/date-time-picker";
-import { useCreateResource, useGetList } from "@/providers/dataProvider";
+import { useFileResource, useGetList } from "@/providers/dataProvider";
 import { toast } from "sonner";
-import { EvaluationType, Classroom } from "@/types/entities";
+import {
+  EvaluationType,
+  Classroom,
+  SubjectType,
+  evaluationTypeConfig,
+  subjectTypeConfig
+} from "@/types/entities";
 import FileUpload from "@/components/file-upload";
 import { motion } from "framer-motion";
 import {
@@ -46,90 +52,77 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-
-const evaluationTypeConfig = {
-  POO_JAVA: {
-    label: "Programmation Orientée Objet (Java)",
-    icon: Braces,
-    color: "text-red-500",
-    description: "Concepts et pratiques de la POO en Java"
-  },
-  C_LANGUAGE: {
-    label: "Langage C",
-    icon: Code2,
-    color: "text-blue-500",
-    description: "Programmation bas niveau et gestion de la mémoire"
-  },
-  SQL: {
-    label: "Base de données (SQL)",
-    icon: Database,
-    color: "text-green-500",
-    description: "Requêtes et conception de bases de données"
-  },
-  PYTHON: {
-    label: "Python",
-    icon: Hash,
-    color: "text-yellow-500",
-    description: "Programmation Python et ses frameworks"
-  },
-  ALGORITHMS: {
-    label: "Algorithmes",
-    icon: Network,
-    color: "text-purple-500",
-    description: "Conception et analyse d'algorithmes"
-  },
-  DATA_STRUCTURES: {
-    label: "Structures de Données",
-    icon: Blocks,
-    color: "text-orange-500",
-    description: "Implémentation et utilisation des structures de données"
-  }
-} as const;
+import Lottie from "lottie-react";
+import uploadAnimation from "@/../public/animations/upload.json";
 
 export default function CreateEvaluationPage() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     evaluationType: "" as EvaluationType,
+    subjectType: "PDF" as SubjectType,
     startDate: new Date(),
     endDate: new Date(),
-    fileUrl: "",
     classroomId: ""
   });
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showUploadAnimation, setShowUploadAnimation] = useState(false);
+
+  const { mutateAsync: uploadEvaluation } = useFileResource<any>("subject");
   const { data: classroomsData } = useGetList("classroom/my-classes", {
     limit: 100,
     page: 1
   });
   const classrooms = classroomsData?.data ?? [];
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { mutateAsync: createEvaluation } = useCreateResource("evaluation");
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedFile) {
+      toast.error("Veuillez sélectionner un fichier");
+      return;
+    }
+
     setIsSubmitting(true);
+    setShowUploadAnimation(true);
 
     try {
-      await createEvaluation(formData, {
-        onSuccess: () => {
-          toast.success("Évaluation créée avec succès");
-          setFormData({
-            title: "",
-            description: "",
-            evaluationType: "" as EvaluationType,
-            startDate: new Date(),
-            endDate: new Date(),
-            fileUrl: "",
-            classroomId: ""
-          });
-        },
-        onError: (error: Error) => {
-          toast.error(error.message || "Erreur lors de la création");
-        }
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("evaluationType", formData.evaluationType);
+      formDataToSend.append("type", formData.subjectType);
+      formDataToSend.append("startDate", formData.startDate.toISOString());
+      formDataToSend.append("endDate", formData.endDate.toISOString());
+      formDataToSend.append("classroomId", formData.classroomId);
+      formDataToSend.append("file", selectedFile);
+
+      await uploadEvaluation(formDataToSend);
+
+      toast.success("Évaluation créée avec succès");
+
+      // Réinitialisation du formulaire
+      setFormData({
+        title: "",
+        description: "",
+        evaluationType: "" as EvaluationType,
+        subjectType: "PDF" as SubjectType,
+        startDate: new Date(),
+        endDate: new Date(),
+        classroomId: ""
       });
+      setSelectedFile(null);
+
+      // Animation de succès
+      setTimeout(() => {
+        setShowUploadAnimation(false);
+      }, 1500);
     } catch (error: any) {
-      toast.error(error.message || "Une erreur est survenue");
+      toast.error(
+        error.message || "Une erreur est survenue lors de la création"
+      );
+      setShowUploadAnimation(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -137,6 +130,21 @@ export default function CreateEvaluationPage() {
 
   return (
     <ContentLayout title="Nouvelle évaluation">
+      {showUploadAnimation && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-sm w-full">
+            <Lottie
+              animationData={uploadAnimation}
+              loop={true}
+              className="w-32 h-32 mx-auto"
+            />
+            <p className="text-center text-xl font-semibold mt-4">
+              Création de l'évaluation en cours...
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto">
         <Card className="border-t-4 border-t-primary shadow-lg">
           <CardHeader>
@@ -358,29 +366,110 @@ export default function CreateEvaluationPage() {
                 </div>
               </motion.div>
 
-              <div className="space-y-2">
-                <Label>Fichier d'évaluation</Label>
-                <FileUpload
-                  acceptedFileTypes={{
-                    "application/pdf": [".pdf"],
-                    "application/msword": [".doc", ".docx"]
-                  }}
-                  allowMultiple={false}
-                  onFileSelect={(files) =>
-                    setFormData({
-                      ...formData,
-                      fileUrl: files[0] ? URL.createObjectURL(files[0]) : ""
-                    })
-                  }
-                  hideSubmitButton={true}
-                />
+              <div className=" space-y-6 md:grid-cols-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="space-y-2"
+                >
+                  <Label className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    Type de document
+                  </Label>
+                  <Select
+                    value={formData.subjectType}
+                    onValueChange={(value: SubjectType) =>
+                      setFormData({ ...formData, subjectType: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(subjectTypeConfig).map(
+                        ([type, config]) => (
+                          <SelectItem key={type} value={type}>
+                            <div className="flex items-center gap-2">
+                              {React.createElement(config.icon, {
+                                className: `h-4 w-4 ${config.color}`
+                              })}
+                              {config.label}
+                            </div>
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectContent>
+                  </Select>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="space-y-4"
+                >
+                  <Label className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    Fichier d'évaluation
+                  </Label>
+                  <FileUpload
+                    acceptedFileTypes={
+                      subjectTypeConfig[formData.subjectType].acceptedTypes
+                    }
+                    allowMultiple={false}
+                    onFileSelect={(files) => {
+                      if (files.length > 0) {
+                        const file = files[0];
+                        const fileExtension = `.${file.name
+                          .split(".")
+                          .pop()
+                          ?.toLowerCase()}`;
+                        const acceptedExtensions = Object.values(
+                          subjectTypeConfig[formData.subjectType].acceptedTypes
+                        ).flat();
+
+                        if (acceptedExtensions.includes(fileExtension)) {
+                          setSelectedFile(file);
+                        } else {
+                          toast.error(
+                            `Type de fichier non autorisé. Types acceptés : ${acceptedExtensions.join(
+                              ", "
+                            )}`
+                          );
+                        }
+                      }
+                    }}
+                    hideSubmitButton={true}
+                  />
+                </motion.div>
               </div>
 
               <div className="flex justify-end gap-3">
-                <Button variant="outline" type="button" className="w-32">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="w-32"
+                  onClick={() => {
+                    setFormData({
+                      title: "",
+                      description: "",
+                      evaluationType: "" as EvaluationType,
+                      subjectType: "PDF" as SubjectType,
+                      startDate: new Date(),
+                      endDate: new Date(),
+                      classroomId: ""
+                    });
+                    setSelectedFile(null);
+                  }}
+                >
                   Annuler
                 </Button>
-                <Button type="submit" className="w-32" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="w-32"
+                  disabled={isSubmitting || !selectedFile}
+                >
                   {isSubmitting ? (
                     <motion.div
                       initial={{ opacity: 0 }}

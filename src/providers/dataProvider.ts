@@ -169,3 +169,20 @@ export const useGetResourceWithoutParams = <TData>(resource: string) => {
         },
     });
 };
+
+export const useFileResource = <TData>(resource: string) => {
+    const queryClient = useQueryClient();
+
+    return useMutation<TData, Error, FormData>({
+        mutationFn: (formData: FormData) => {
+            return api.post(resource, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }).then(res => res.data);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`${resource}s`] });
+        }
+    });
+};

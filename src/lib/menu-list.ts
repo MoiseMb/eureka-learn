@@ -80,11 +80,11 @@ export function getMenuList(pathname: string, role?: string): Group[] {
           icon: ClipboardList,
           submenus: [
             {
-              href: "evaluation/create",
+              href: "/professor/evaluation/create",
               label: "Créer une évaluation"
             },
             {
-              href: "/my-evaluations/list",
+              href: "/professor/evaluation",
               label: "Liste des évaluations"
             }
           ]
