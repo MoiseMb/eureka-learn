@@ -32,28 +32,11 @@ import {
 } from "@/types/entities";
 import FileUpload from "@/components/file-upload";
 import { motion } from "framer-motion";
-import {
-  Book,
-  Calendar,
-  FileText,
-  Clock,
-  Users,
-  School,
-  Code2,
-  Database,
-  Binary,
-  Terminal,
-  Braces,
-  FileCode2,
-  GraduationCap,
-  Hash,
-  Blocks,
-  Network
-} from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+import { Book, FileText, Clock, School } from "lucide-react";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import Lottie from "lottie-react";
 import uploadAnimation from "@/../public/animations/upload.json";
+import { useRouter } from "next/navigation";
 
 export default function CreateEvaluationPage() {
   const [formData, setFormData] = useState({
@@ -65,7 +48,7 @@ export default function CreateEvaluationPage() {
     endDate: new Date(),
     classroomId: ""
   });
-
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showUploadAnimation, setShowUploadAnimation] = useState(false);
@@ -115,6 +98,7 @@ export default function CreateEvaluationPage() {
 
       setTimeout(() => {
         setShowUploadAnimation(false);
+        router.push("/professor/evaluation");
       }, 1500);
     } catch (error: any) {
       toast.error(
@@ -123,6 +107,28 @@ export default function CreateEvaluationPage() {
       setShowUploadAnimation(false);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDownload = async (url: string, filename: string) => {
+    try {
+      // Utilisation d'une fonction qui sera exécutée uniquement côté client
+      if (typeof window !== "undefined") {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const objectUrl = window.URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(objectUrl);
+      }
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
+      toast.error("Erreur lors du téléchargement du fichier");
     }
   };
 
@@ -149,47 +155,63 @@ export default function CreateEvaluationPage() {
             <div className="flex items-center gap-3">
               <Book className="h-8 w-8 text-primary" />
               <div>
-                <CardTitle className="text-2xl">Créer une évaluation</CardTitle>
+                <CardTitle className="text-2xl">Nouvelle évaluation</CardTitle>
                 <CardDescription>
-                  Remplissez les informations pour créer une nouvelle évaluation
+                  Créez une nouvelle évaluation pour vos étudiants
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid gap-6 md:grid-cols-2">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-2"
-                >
-                  <Label htmlFor="title" className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    Titre
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData({ ...formData, title: e.target.value })
-                    }
-                    placeholder="Titre de l'évaluation"
-                    className="border-primary/20"
-                    required
-                  />
-                </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-2"
+              >
+                <Label className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  Titre de l&apos;évaluation
+                </Label>
+                <Input
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  placeholder="Titre de l'évaluation"
+                  className="border-primary/20"
+                  required
+                />
+              </motion.div>
 
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="space-y-2"
+              >
+                <Label className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                  Description
+                </Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Description de l'évaluation"
+                  className="min-h-[100px] border-primary/20"
+                />
+              </motion.div>
+
+              <div className="grid gap-6 md:grid-cols-2">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
                   className="space-y-2"
                 >
-                  <Label
-                    htmlFor="classroomId"
-                    className="flex items-center gap-2"
-                  >
+                  <Label className="flex items-center gap-2">
                     <School className="h-4 w-4 text-muted-foreground" />
                     Classe
                   </Label>
@@ -198,8 +220,9 @@ export default function CreateEvaluationPage() {
                     onValueChange={(value) =>
                       setFormData({ ...formData, classroomId: value })
                     }
+                    required
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Sélectionner une classe" />
                     </SelectTrigger>
                     <SelectContent>
@@ -208,133 +231,93 @@ export default function CreateEvaluationPage() {
                           key={classroom.id}
                           value={classroom.id.toString()}
                         >
-                          <div className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                            {classroom.name}
-                          </div>
+                          {classroom.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </motion.div>
-              </div>
 
-              <Separator />
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="space-y-2"
-              >
-                <Label
-                  htmlFor="description"
-                  className="flex items-center gap-2"
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="space-y-2"
                 >
-                  <Book className="h-4 w-4 text-muted-foreground" />
-                  Description
-                </Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  placeholder="Description détaillée de l'évaluation"
-                  className="min-h-[100px] border-primary/20"
-                />
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="space-y-4"
-              >
-                <Label className="flex items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                  Type d&apos;évaluation
-                </Label>
-                <Select
-                  value={formData.evaluationType}
-                  onValueChange={(value) =>
-                    setFormData({
-                      ...formData,
-                      evaluationType: value as EvaluationType
-                    })
-                  }
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Sélectionner le type d'évaluation">
-                      {formData.evaluationType && (
-                        <div className="flex items-center gap-2">
-                          {evaluationTypeConfig[
-                            formData.evaluationType as keyof typeof evaluationTypeConfig
-                          ].icon && (
-                            <div
-                              className={`${
-                                evaluationTypeConfig[
-                                  formData.evaluationType as keyof typeof evaluationTypeConfig
-                                ].color
-                              }`}
-                            >
-                              {React.createElement(
-                                evaluationTypeConfig[
-                                  formData.evaluationType as keyof typeof evaluationTypeConfig
-                                ].icon,
-                                { size: 16 }
-                              )}
-                            </div>
-                          )}
-                          {
-                            evaluationTypeConfig[
-                              formData.evaluationType as keyof typeof evaluationTypeConfig
-                            ].label
-                          }
-                        </div>
-                      )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(evaluationTypeConfig).map(
-                      ([type, config]) => {
-                        const Icon = config.icon;
-                        return (
-                          <SelectItem
-                            key={type}
-                            value={type}
-                            className="flex items-center gap-2 py-3"
-                          >
-                            <div className="flex items-center gap-2 w-full">
-                              <div className={`p-1 rounded-md ${config.color}`}>
-                                <Icon className="h-4 w-4" />
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="font-medium">
-                                  {config.label}
-                                </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {config.description}
-                                </span>
-                              </div>
-                            </div>
-                          </SelectItem>
-                        );
-                      }
-                    )}
-                  </SelectContent>
-                </Select>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="grid gap-6 md:grid-cols-2"
-              >
-                <div className="space-y-2">
                   <Label className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <FileText className="h-4 w-4 text-muted-foreground" />
+                    Type d&apos;évaluation
+                  </Label>
+                  <Select
+                    value={formData.evaluationType}
+                    onValueChange={(value: EvaluationType) =>
+                      setFormData({ ...formData, evaluationType: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sélectionner le type d'évaluation">
+                        {formData.evaluationType && (
+                          <div className="flex items-center gap-2">
+                            {React.createElement(
+                              evaluationTypeConfig[formData.evaluationType]
+                                .icon,
+                              {
+                                className: `h-4 w-4 ${
+                                  evaluationTypeConfig[formData.evaluationType]
+                                    .color
+                                }`
+                              }
+                            )}
+                            {
+                              evaluationTypeConfig[formData.evaluationType]
+                                .label
+                            }
+                          </div>
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(evaluationTypeConfig).map(
+                        ([type, config]) => {
+                          const Icon = config.icon;
+                          return (
+                            <SelectItem
+                              key={type}
+                              value={type}
+                              className="flex items-center gap-2 py-3"
+                            >
+                              <div className="flex items-center gap-2 w-full">
+                                <div
+                                  className={`p-1 rounded-md ${config.color}`}
+                                >
+                                  <Icon className={`h-4 w-4 ${config.color}`} />
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {config.label}
+                                  </span>
+                                  <span className="text-xs text-muted-foreground">
+                                    {config.description}
+                                  </span>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          );
+                        }
+                      )}
+                    </SelectContent>
+                  </Select>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="space-y-2"
+                >
+                  <Label className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
                     Date de début
                   </Label>
                   <DateTimePicker
@@ -345,11 +328,15 @@ export default function CreateEvaluationPage() {
                         startDate: date || new Date()
                       })
                     }
-                    minDate={new Date()}
                   />
-                </div>
+                </motion.div>
 
-                <div className="space-y-2">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="space-y-2"
+                >
                   <Label className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     Date de fin
@@ -361,8 +348,8 @@ export default function CreateEvaluationPage() {
                     }
                     minDate={formData.startDate}
                   />
-                </div>
-              </motion.div>
+                </motion.div>
+              </div>
 
               <div className=" space-y-6 md:grid-cols-2">
                 <motion.div
@@ -414,6 +401,9 @@ export default function CreateEvaluationPage() {
                                   <span className="font-medium">
                                     {config.label}
                                   </span>
+                                  {/* <span className="text-xs text-muted-foreground">
+                                    {config.description}
+                                  </span> */}
                                 </div>
                               </div>
                             </SelectItem>
@@ -478,7 +468,7 @@ export default function CreateEvaluationPage() {
                       Création en cours...
                     </>
                   ) : (
-                    "Créer l'évaluation"
+                    "Créer l&apos;évaluation"
                   )}
                 </Button>
               </div>
