@@ -93,18 +93,17 @@ export function getMenuList(pathname: string, role?: string): Group[] {
     }
   ];
 
-  // Menus spécifiques aux élèves
   const studentMenus = [
     {
       groupLabel: "Mon Espace",
       menus: [
         {
-          href: "/my-evaluations",
+          href: "/student/evaluation",
           label: "Mes Évaluations",
           icon: ClipboardList
         },
         {
-          href: "/my-results",
+          href: "/student/results",
           label: "Mes Résultats",
           icon: School
         }

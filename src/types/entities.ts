@@ -123,9 +123,11 @@ export type Subject = {
     endDate: Date;
     evaluationType: EvaluationType;
     teacher: User;
+    type: SubjectType;
     teacherId: number;
     createdAt: Date;
-    classroomId?: number;
+    classroomId: number;
+    classroom: Classroom;
     updatedAt: Date;
     submissions?: Submission[];
 }
@@ -138,12 +140,14 @@ export type Submission = {
     studentId: number;
     subject: Subject;
     subjectId: number;
-    correction?: Correction;
+    createdAt: Date;
+    isCorrecting: boolean;
+    isCorrected: boolean;
 }
 
 export type Correction = {
     id: number;
-    score?: number;
+    score: number;
     correctedAt: Date;
     notes?: string;
     evaluationType: EvaluationType;
