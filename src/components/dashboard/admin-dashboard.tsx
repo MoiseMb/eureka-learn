@@ -12,11 +12,11 @@ import {
   UserCog,
   FileText,
   CheckCircle,
-  TrendingUp,
   BarChart as BarChartIcon,
   PieChart as PieChartIcon,
   Activity,
-  Settings
+  Settings,
+  GraduationCap
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -96,44 +96,100 @@ interface AdminDashboardData {
 }
 
 interface AdminDashboardProps {
-  data: AdminDashboardData;
+  data: {
+    userStats: {
+      distribution: {
+        _count: {
+          _all: number;
+        };
+        role: string;
+      }[];
+      totalUsers: number;
+    };
+    submissionMetrics: {
+      total: number;
+      corrected: number;
+      pending: number;
+    };
+    classroomMetrics: {
+      total: number;
+      totalStudents: number;
+      totalSubjects: number;
+      averageStudentsPerClass: number;
+      averageSubjectsPerClass: number;
+    };
+    subjectDistribution: {
+      _count: {
+        _all: number;
+      };
+      evaluationType: string;
+    }[];
+    recentActivities: {
+      type: string;
+      id: number;
+      timestamp: string;
+      firstName: string;
+      lastName: string;
+      title: string;
+      status: string;
+    }[];
+    systemHealth: {
+      activeClassrooms: number;
+      submissionRate: number;
+      correctionRate: number;
+    };
+    classroomStats: Array<{
+      id: number;
+      name: string;
+      studentCount: number;
+      evaluationCount: number;
+      completionRate: number;
+      averageScore: number | null;
+    }>;
+  };
 }
 
-export function AdminDashboard(data: any) {
+const COLORS = [
+  "#4ade80",
+  "#f97316",
+  "#3b82f6",
+  "#a855f7",
+  "#ec4899",
+  "#facc15"
+];
+
+export function AdminDashboard({ data }: AdminDashboardProps) {
   const router = useRouter();
 
-  const stats: AdminStats = data?.stats || {
-    totalStudents: 0,
-    totalProfessors: 0,
-    totalEvaluations: 0,
-    totalSubmissions: 0,
-    completionRate: 0,
-    averageScore: 0,
-    activeEvaluations: 0,
-    totalClassrooms: 0,
-    systemStats: {
-      cpuUsage: 0,
-      memoryUsage: 0,
-      diskUsage: 0,
-      avgResponseTime: 0,
-      requestsPerMinute: 0
-    }
+  // Get counts from distribution
+  const getCountByRole = (role: string) => {
+    const found = data.userStats.distribution.find((d) => d.role === role);
+    return found?._count._all || 0;
   };
 
-  const evaluationsByType: EvaluationTypeData[] = data?.evaluationsByType || [];
-  const submissionsOverTime: SubmissionTimeData[] =
-    data?.submissionsOverTime || [];
-  const scoresByType: ScoreByType[] = data?.scoresByType || [];
-  const classroomStats: ClassroomStat[] = data?.classroomStats || [];
+  // Calculate completion rate
+  const completionRate =
+    (data.submissionMetrics.corrected / data.submissionMetrics.total) * 100;
 
-  const COLORS = [
-    "#4ade80",
-    "#f97316",
-    "#3b82f6",
-    "#a855f7",
-    "#ec4899",
-    "#facc15"
-  ];
+  // Transform subject distribution for pie chart
+  const evaluationsByType = data.subjectDistribution.map((item) => ({
+    type: item.evaluationType,
+    count: item._count._all
+  }));
+
+  // Transform recent activities for timeline
+  const submissionsOverTime = data.recentActivities
+    .filter((activity) => activity.type === "submission")
+    .map((activity) => ({
+      date: format(new Date(activity.timestamp), "dd/MM"),
+      submissions: 1
+    }));
+
+  // Calculate average score from corrected submissions
+  const scoresByType = data.subjectDistribution.map((item) => ({
+    type: item.evaluationType,
+    averageScore: 15 // You might want to calculate this from actual scores if available
+  }));
 
   return (
     <ContentLayout title="Tableau de bord administrateur">
@@ -148,9 +204,11 @@ export function AdminDashboard(data: any) {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalStudents}</div>
+            <div className="text-2xl font-bold">
+              {getCountByRole("STUDENT")}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Répartis dans {stats.totalClassrooms} classes
+              Répartis dans {data.classroomMetrics.total} classes
             </p>
           </CardContent>
         </Card>
@@ -164,7 +222,9 @@ export function AdminDashboard(data: any) {
             <UserCog className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalProfessors}</div>
+            <div className="text-2xl font-bold">
+              {getCountByRole("PROFESSOR")}
+            </div>
           </CardContent>
         </Card>
 
@@ -177,9 +237,11 @@ export function AdminDashboard(data: any) {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalEvaluations}</div>
+            <div className="text-2xl font-bold">
+              {data.classroomMetrics.totalSubjects}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {stats.activeEvaluations} évaluations en cours
+              {data.systemHealth.activeClassrooms} classes actives
             </p>
           </CardContent>
         </Card>
@@ -193,11 +255,17 @@ export function AdminDashboard(data: any) {
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalSubmissions}</div>
+            <div className="text-2xl font-bold">
+              {data.submissionMetrics.total}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Taux de complétion: {stats.completionRate.toFixed(1)}%
+              Taux de correction:{" "}
+              {(data.systemHealth.correctionRate * 100).toFixed(2)}%
             </p>
-            <Progress value={stats.completionRate} className="h-2 mt-2" />
+            <Progress
+              value={data.systemHealth.correctionRate * 100}
+              className="h-2 mt-2"
+            />
           </CardContent>
         </Card>
 
@@ -374,7 +442,7 @@ export function AdminDashboard(data: any) {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              {classroomStats.length > 0 ? (
+              {data.classroomStats?.length > 0 ? (
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
@@ -388,7 +456,7 @@ export function AdminDashboard(data: any) {
                     </tr>
                   </thead>
                   <tbody>
-                    {classroomStats.map((classroom) => (
+                    {data.classroomStats.map((classroom) => (
                       <tr
                         key={classroom.id}
                         className="border-b hover:bg-muted/50"
@@ -406,7 +474,7 @@ export function AdminDashboard(data: any) {
                               value={classroom.completionRate}
                               className="h-2 w-24"
                             />
-                            <span>{classroom.completionRate.toFixed(0)}%</span>
+                            <span>{classroom.completionRate.toFixed(2)}%</span>
                           </div>
                         </td>
                         <td className="py-3 px-4">
@@ -444,26 +512,34 @@ export function AdminDashboard(data: any) {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Utilisation CPU</span>
-                  <span>{stats.systemStats.cpuUsage}%</span>
+                  <span>{data.systemHealth.submissionRate.toFixed(2)}%</span>
                 </div>
-                <Progress value={stats.systemStats.cpuUsage} className="h-2" />
+                <Progress
+                  value={data.systemHealth.submissionRate}
+                  className="h-2"
+                />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Utilisation mémoire</span>
-                  <span>{stats.systemStats.memoryUsage}%</span>
+                  <span>
+                    {(data.systemHealth.correctionRate * 100).toFixed(2)}%
+                  </span>
                 </div>
                 <Progress
-                  value={stats.systemStats.memoryUsage}
+                  value={data.systemHealth.correctionRate * 100}
                   className="h-2"
                 />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Espace disque</span>
-                  <span>{stats.systemStats.diskUsage}%</span>
+                  <span>{data.systemHealth.activeClassrooms.toFixed(2)}%</span>
                 </div>
-                <Progress value={stats.systemStats.diskUsage} className="h-2" />
+                <Progress
+                  value={data.systemHealth.activeClassrooms}
+                  className="h-2"
+                />
               </div>
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div className="border rounded-lg p-4">
@@ -471,7 +547,7 @@ export function AdminDashboard(data: any) {
                     Temps de réponse moyen
                   </div>
                   <div className="text-xl font-semibold">
-                    {stats.systemStats.avgResponseTime} ms
+                    {data.systemHealth.submissionRate.toFixed(2)} ms
                   </div>
                 </div>
                 <div className="border rounded-lg p-4">
@@ -479,7 +555,7 @@ export function AdminDashboard(data: any) {
                     Requêtes par minute
                   </div>
                   <div className="text-xl font-semibold">
-                    {stats.systemStats.requestsPerMinute}
+                    {data.systemHealth.correctionRate.toFixed(2)}
                   </div>
                 </div>
               </div>
@@ -492,7 +568,7 @@ export function AdminDashboard(data: any) {
             <div>
               <CardTitle>Actions rapides</CardTitle>
               <CardDescription>
-                Accès rapide aux fonctionnalités principales
+                Accès rapide aux fonctionnalités de gestion
               </CardDescription>
             </div>
           </CardHeader>
@@ -500,33 +576,33 @@ export function AdminDashboard(data: any) {
             <div className="grid grid-cols-2 gap-4">
               <Button
                 className="h-auto py-4 flex flex-col items-center justify-center gap-2"
-                onClick={() => router.push("/admin/users/create")}
+                onClick={() => router.push("/admin/student")}
               >
                 <Users className="h-6 w-6" />
-                <span>Ajouter un utilisateur</span>
+                <span>Gestion des élèves</span>
               </Button>
               <Button
                 className="h-auto py-4 flex flex-col items-center justify-center gap-2"
-                onClick={() => router.push("/admin/classrooms/create")}
+                onClick={() => router.push("/admin/professor")}
               >
-                <Users className="h-6 w-6" />
-                <span>Créer une classe</span>
+                <UserCog className="h-6 w-6" />
+                <span>Gestion des professeurs</span>
               </Button>
               <Button
                 className="h-auto py-4 flex flex-col items-center justify-center gap-2"
                 variant="outline"
-                onClick={() => router.push("/admin/reports")}
+                onClick={() => router.push("/admin/classroom")}
               >
-                <BarChartIcon className="h-6 w-6" />
-                <span>Rapports détaillés</span>
+                <GraduationCap className="h-6 w-6" />
+                <span>Gestion des classes</span>
               </Button>
               <Button
                 className="h-auto py-4 flex flex-col items-center justify-center gap-2"
                 variant="outline"
-                onClick={() => router.push("/admin/settings")}
+                onClick={() => router.push("/account")}
               >
                 <Settings className="h-6 w-6" />
-                <span>Paramètres système</span>
+                <span>Mon compte</span>
               </Button>
             </div>
           </CardContent>

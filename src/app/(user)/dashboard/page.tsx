@@ -34,7 +34,7 @@ export default function DashboardPage() {
     case Role.PROFESSOR:
       return <ProfessorDashboard data={dashboardData} />;
     case Role.ADMIN:
-      return <AdminDashboard data={dashboardData} />;
+      return <AdminDashboard data={dashboardData as any} />;
     default:
       return (
         <ContentLayout title="Tableau de bord">

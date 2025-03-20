@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { getSession } from "next-auth/react";
 
 export const api = axios.create({
-    baseURL: "https://eureka-learn-api.vercel.app",
+    baseURL: "http://localhost:3002",
     headers: {
         "Content-Type": "application/json",
     },

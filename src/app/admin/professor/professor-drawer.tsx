@@ -1,78 +1,78 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerFooter
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetFooter
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Users, GraduationCap, CalendarDays, Pencil, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 import type { User, Classroom } from "@/types/entities";
 import { formatDate } from "@/lib/utils";
 
-interface ProfessorDrawerProps {
+interface ProfessorSheetProps {
   professor: User | null;
   isOpen: boolean;
   onClose: () => void;
   onEdit: (professor: User) => void;
 }
 
-export function ProfessorDrawer({
+export function ProfessorSheet({
   professor,
   isOpen,
   onClose,
   onEdit
-}: ProfessorDrawerProps) {
+}: ProfessorSheetProps) {
   if (!professor) return null;
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose} direction="right">
-      <DrawerContent className="h-[98%] w-[400px] my-auto">
-        <DrawerHeader className="border-b pb-4">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent
+        side="right"
+        className="w-[600px] sm:w-[540px] p-0 bg-gradient-to-br from-white to-slate-50 my-6 ml-6 mr-4 rounded-xl shadow-2xl"
+      >
+        <SheetHeader className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-xl w-full">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="flex items-center gap-2 text-xl">
-              <GraduationCap className="h-6 w-6" />
-              {professor.firstName} {professor.lastName}
-            </DrawerTitle>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-3">
+              <GraduationCap className="h-8 w-8" />
+              <h2 className="text-2xl font-bold">
+                {professor.firstName} {professor.lastName}
+              </h2>
+            </div>
           </div>
-        </DrawerHeader>
+        </SheetHeader>
 
-        <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Email
-              </h3>
-              <Separator className="my-2" />
-              <p className="text-sm">{professor.email}</p>
-            </div>
+        <ScrollArea className="h-[calc(100vh-16rem)] p-6">
+          <div className="space-y-6">
+            {/* Email Section */}
+            <Card className="p-6 bg-white shadow-sm">
+              <h3 className="text-lg font-semibold mb-3">Email</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                {professor.email}
+              </p>
+            </Card>
 
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Classes
-              </h3>
-              <Separator className="my-2" />
+            {/* Classes Count Section */}
+            <Card className="p-6 bg-white shadow-sm">
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                <Badge variant="secondary" className="rounded-full">
-                  {professor.teaching?.length || 0} classes
-                </Badge>
+                <Users className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-semibold">Classes</h3>
               </div>
-            </div>
+              <Separator className="my-3" />
+              <Badge variant="secondary" className="rounded-full">
+                {professor.teaching?.length || 0} classes
+              </Badge>
+            </Card>
 
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Informations
-              </h3>
-              <Separator className="my-2" />
+            {/* Information Section */}
+            <Card className="p-6 bg-white shadow-sm">
+              <h3 className="text-lg font-semibold mb-3">Informations</h3>
+              <Separator className="my-3" />
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <CalendarDays className="h-4 w-4 text-muted-foreground" />
@@ -83,14 +83,15 @@ export function ProfessorDrawer({
                   <span>Modifié le {formatDate(professor.updatedAt)}</span>
                 </div>
               </div>
-            </div>
+            </Card>
 
+            {/* Classes List Section */}
             {professor.teaching && professor.teaching.length > 0 && (
-              <div className="space-y-1">
-                <h3 className="text-sm font-medium text-muted-foreground">
+              <Card className="p-6 bg-white shadow-sm">
+                <h3 className="text-lg font-semibold mb-3">
                   Liste des classes
                 </h3>
-                <Separator className="my-2" />
+                <Separator className="my-3" />
                 <div className="grid gap-2">
                   {professor.teaching.map((classroom: Classroom) => (
                     <div
@@ -102,23 +103,29 @@ export function ProfessorDrawer({
                     </div>
                   ))}
                 </div>
-              </div>
+              </Card>
             )}
           </div>
         </ScrollArea>
 
-        <DrawerFooter className="border-t p-4">
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
+        <SheetFooter className="p-6 border-t">
+          <div className="flex items-center justify-between w-full">
+            <Button variant="outline" className="w-[48%]" onClick={onClose}>
               Fermer
             </Button>
-            <Button onClick={() => onEdit(professor)}>
+            <Button
+              className="w-[48%] bg-blue-500 hover:bg-blue-600 text-white"
+              onClick={() => {
+                onEdit(professor);
+                onClose();
+              }}
+            >
               <Pencil className="mr-2 h-4 w-4" />
               Modifier
             </Button>
           </div>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

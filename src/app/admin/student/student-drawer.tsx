@@ -1,12 +1,11 @@
 "use client";
 
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerFooter
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetFooter
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import {
   User,
@@ -19,59 +18,60 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card } from "@/components/ui/card";
 import type { User as Student } from "@/types";
 import { formatDate } from "@/lib/utils";
 
-interface StudentDrawerProps {
+interface StudentSheetProps {
   student: Student | null;
   isOpen: boolean;
   onClose: () => void;
   onEdit: (student: Student) => void;
 }
 
-export function StudentDrawer({
+export function StudentSheet({
   student,
   isOpen,
   onClose,
   onEdit
-}: StudentDrawerProps) {
+}: StudentSheetProps) {
   if (!student) return null;
 
   return (
-    <Drawer open={isOpen} onOpenChange={onClose} direction="top">
-      <DrawerContent className=" w-[400px] my-auto">
-        <DrawerHeader className="border-b pb-4">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent
+        side="right"
+        className="w-[600px] sm:w-[540px] p-0 bg-gradient-to-br from-white to-slate-50 my-6 ml-6 mr-4 rounded-xl shadow-2xl"
+      >
+        <SheetHeader className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-xl w-full">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="flex items-center gap-2 text-xl">
-              <User className="h-6 w-6" />
-              {student.firstName} {student.lastName}
-            </DrawerTitle>
-            <Button variant="ghost" size="icon" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-        </DrawerHeader>
-
-        <ScrollArea className="flex-1">
-          <div className="p-6 space-y-6">
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Email
-              </h3>
-              <Separator className="my-2" />
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <p className="text-sm">{student.email}</p>
-              </div>
+            <div className="flex items-center gap-3">
+              <User className="h-8 w-8" />
+              <h2 className="text-2xl font-bold">
+                {student.firstName} {student.lastName}
+              </h2>
             </div>
+          </div>
+        </SheetHeader>
 
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Classe
-              </h3>
-              <Separator className="my-2" />
+        <ScrollArea className="h-[calc(100vh-16rem)] p-6">
+          <div className="space-y-6">
+            {/* Email Section */}
+            <Card className="p-6 bg-white shadow-sm">
+              <h3 className="text-lg font-semibold mb-3">Email</h3>
               <div className="flex items-center gap-2">
-                <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                <p className="text-muted-foreground leading-relaxed">
+                  {student.email}
+                </p>
+              </div>
+            </Card>
+
+            {/* Classroom Section */}
+            <Card className="p-6 bg-white shadow-sm">
+              <h3 className="text-lg font-semibold mb-3">Classe</h3>
+              <div className="flex items-center gap-2">
+                <GraduationCap className="h-5 w-5 text-muted-foreground" />
                 {student.classroom ? (
                   <Badge variant="secondary" className="rounded-full">
                     {student.classroom.name}
@@ -80,13 +80,12 @@ export function StudentDrawer({
                   <span className="text-muted-foreground">Non assigné</span>
                 )}
               </div>
-            </div>
+            </Card>
 
-            <div className="space-y-1">
-              <h3 className="text-sm font-medium text-muted-foreground">
-                Informations
-              </h3>
-              <Separator className="my-2" />
+            {/* Information Section */}
+            <Card className="p-6 bg-white shadow-sm">
+              <h3 className="text-lg font-semibold mb-3">Informations</h3>
+              <Separator className="my-3" />
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm">
                   <CalendarDays className="h-4 w-4 text-muted-foreground" />
@@ -97,16 +96,17 @@ export function StudentDrawer({
                   <span>Modifié le {formatDate(student.updatedAt)}</span>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </ScrollArea>
 
-        <DrawerFooter className="border-t p-4">
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={onClose}>
+        <SheetFooter className="p-6 border-t">
+          <div className="flex items-center justify-between w-full">
+            <Button variant="outline" className="w-[48%]" onClick={onClose}>
               Fermer
             </Button>
             <Button
+              className="w-[48%] bg-blue-500 hover:bg-blue-600 text-white"
               onClick={() => {
                 onEdit(student);
                 onClose();
@@ -116,8 +116,8 @@ export function StudentDrawer({
               Modifier
             </Button>
           </div>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }

@@ -32,7 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Classroom } from "@/types";
 import { DataTable } from "@/components/ui/data-table/data-table";
-import { ClassroomDrawer } from "./classroom-drawer";
+import { ClassroomSheet } from "./classroom-drawer";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 interface PaginationParams {
@@ -259,7 +259,7 @@ export default function ClassroomPage() {
           cancelText="Annuler"
         />
 
-        <ClassroomDrawer
+        <ClassroomSheet
           classroom={selectedClassroom}
           isOpen={isDrawerOpen}
           onClose={() => {

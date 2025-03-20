@@ -36,7 +36,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Role, User as Student } from "@/types";
 import { DataTable } from "@/components/ui/data-table/data-table";
-import { StudentDrawer } from "./student-drawer";
+import { StudentSheet } from "./student-drawer";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 
 export default function StudentsPage() {
@@ -259,7 +259,7 @@ export default function StudentsPage() {
           cancelText="Annuler"
         />
 
-        <StudentDrawer
+        <StudentSheet
           student={selectedStudent}
           isOpen={isDrawerOpen}
           onClose={() => {

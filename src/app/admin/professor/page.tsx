@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProfessorDialog } from "./professor-dialog";
-import { ProfessorDrawer } from "./professor-drawer";
+import { ProfessorSheet } from "./professor-drawer";
 import { AlertDialog } from "@/components/ui/alert-dialog";
 import {
   Plus,
@@ -236,7 +236,7 @@ export default function ProfessorsPage() {
           onSuccess={refetch}
         />
 
-        <ProfessorDrawer
+        <ProfessorSheet
           professor={selectedProfessor}
           isOpen={isDrawerOpen}
           onClose={() => {
