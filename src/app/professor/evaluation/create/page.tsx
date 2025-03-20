@@ -102,7 +102,6 @@ export default function CreateEvaluationPage() {
 
       toast.success("Évaluation créée avec succès");
 
-      // Réinitialisation du formulaire
       setFormData({
         title: "",
         description: "",
@@ -114,7 +113,6 @@ export default function CreateEvaluationPage() {
       });
       setSelectedFile(null);
 
-      // Animation de succès
       setTimeout(() => {
         setShowUploadAnimation(false);
       }, 1500);
@@ -132,14 +130,14 @@ export default function CreateEvaluationPage() {
     <ContentLayout title="Nouvelle évaluation">
       {showUploadAnimation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-sm w-full">
+          <div className="bg-white rounded-lg p-12 max-w-md w-full">
             <Lottie
               animationData={uploadAnimation}
               loop={true}
-              className="w-32 h-32 mx-auto"
+              style={{ width: 250, height: 250, margin: "0 auto" }}
             />
             <p className="text-center text-xl font-semibold mt-4">
-              Création de l'évaluation en cours...
+              Création de l&apos;évaluation en cours...
             </p>
           </div>
         </div>
@@ -255,7 +253,7 @@ export default function CreateEvaluationPage() {
               >
                 <Label className="flex items-center gap-2">
                   <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                  Type d'évaluation
+                  Type d&apos;évaluation
                 </Label>
                 <Select
                   value={formData.evaluationType}
@@ -383,21 +381,44 @@ export default function CreateEvaluationPage() {
                       setFormData({ ...formData, subjectType: value })
                     }
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type" />
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sélectionner le type de document">
+                        {formData.subjectType && (
+                          <div className="flex items-center gap-2">
+                            {React.createElement(
+                              subjectTypeConfig[formData.subjectType].icon,
+                              {
+                                className: "h-4 w-4 text-muted-foreground"
+                              }
+                            )}
+                            {subjectTypeConfig[formData.subjectType].label}
+                          </div>
+                        )}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {Object.entries(subjectTypeConfig).map(
-                        ([type, config]) => (
-                          <SelectItem key={type} value={type}>
-                            <div className="flex items-center gap-2">
-                              {React.createElement(config.icon, {
-                                className: `h-4 w-4 ${config.color}`
-                              })}
-                              {config.label}
-                            </div>
-                          </SelectItem>
-                        )
+                        ([type, config]) => {
+                          const Icon = config.icon;
+                          return (
+                            <SelectItem
+                              key={type}
+                              value={type}
+                              className="flex items-center gap-2 py-3"
+                            >
+                              <div className="flex items-center gap-2 w-full">
+                                <div className="p-1 rounded-md bg-muted">
+                                  <Icon className="h-4 w-4" />
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {config.label}
+                                  </span>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          );
+                        }
                       )}
                     </SelectContent>
                   </Select>
@@ -411,7 +432,7 @@ export default function CreateEvaluationPage() {
                 >
                   <Label className="flex items-center gap-2">
                     <FileText className="h-4 w-4 text-muted-foreground" />
-                    Fichier d'évaluation
+                    Fichier d&apos;évaluation
                   </Label>
                   <FileUpload
                     acceptedFileTypes={
@@ -445,42 +466,19 @@ export default function CreateEvaluationPage() {
                 </motion.div>
               </div>
 
-              <div className="flex justify-end gap-3">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="w-32"
-                  onClick={() => {
-                    setFormData({
-                      title: "",
-                      description: "",
-                      evaluationType: "" as EvaluationType,
-                      subjectType: "PDF" as SubjectType,
-                      startDate: new Date(),
-                      endDate: new Date(),
-                      classroomId: ""
-                    });
-                    setSelectedFile(null);
-                  }}
-                >
-                  Annuler
-                </Button>
+              <div className="flex justify-end gap-2">
                 <Button
                   type="submit"
-                  className="w-32"
                   disabled={isSubmitting || !selectedFile}
+                  className="w-full md:w-auto"
                 >
                   {isSubmitting ? (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex items-center gap-2"
-                    >
-                      <Clock className="h-4 w-4 animate-spin" />
-                      Création...
-                    </motion.div>
+                    <>
+                      <Clock className="mr-2 h-4 w-4 animate-spin" />
+                      Création en cours...
+                    </>
                   ) : (
-                    "Créer"
+                    "Créer l'évaluation"
                   )}
                 </Button>
               </div>

@@ -26,9 +26,9 @@ export default function AccountPage() {
 
   const translateRole = (role: string) => {
     const roles = {
-      SUPER_ADMIN: " Administrateur",
-      ADMIN_DPT: "Responsable Département",
-      USER: "Personnel"
+      ADMIN: " Administrateur",
+      TEACHER: "Enseignant",
+      STUDENT: "Étudiant"
     };
     return roles[role as keyof typeof roles] || role;
   };
@@ -252,7 +252,7 @@ export default function AccountPage() {
                 <div className="flex justify-end">
                   <Button
                     type="submit"
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-blue-600 hover:bg-blue-700 h-12 text-md"
                     disabled={isLoading}
                   >
                     {isLoading ? (
