@@ -8,7 +8,8 @@
   },
   "build": {
     "env": {
-      "NEXT_DISABLE_PRERENDER": "true"
+      "NEXT_DISABLE_PRERENDER": "true",
+      "NEXT_LINT": "false"
     }
   }
 }

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
       ? `https://${process.env.VERCEL_URL}`
       : `http://localhost:${process.env.PORT || 3000}`
   ),
-  title: "eduBudgetPro",
+  title: "eureka-learn",
 
   alternates: {
     canonical: "/"

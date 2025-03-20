@@ -45,6 +45,7 @@ import { ContentLayout } from "@/components/admin-panel/content-layout";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
 import { EvaluationDrawer } from "./evaluation-drawer";
+import { toast } from "sonner";
 
 export default function EvaluationListPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -287,9 +288,32 @@ export default function EvaluationListPage() {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() =>
-                                window.open(evaluation.fileUrl, "_blank")
-                              }
+                              onClick={async () => {
+                                try {
+                                  const response = await fetch(
+                                    evaluation.fileUrl
+                                  );
+                                  const blob = await response.blob();
+                                  const url = window.URL.createObjectURL(blob);
+                                  const link = document.createElement("a");
+                                  link.href = url;
+                                  link.download = `${
+                                    evaluation.title
+                                  }.${evaluation.type.toLowerCase()}`;
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                  window.URL.revokeObjectURL(url);
+                                } catch (error) {
+                                  console.error(
+                                    "Erreur lors du téléchargement:",
+                                    error
+                                  );
+                                  toast.error(
+                                    "Erreur lors du téléchargement du fichier"
+                                  );
+                                }
+                              }}
                             >
                               <Download className="h-4 w-4" />
                             </Button>
