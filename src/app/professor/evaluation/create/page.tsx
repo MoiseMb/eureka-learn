@@ -110,28 +110,6 @@ export default function CreateEvaluationPage() {
     }
   };
 
-  const handleDownload = async (url: string, filename: string) => {
-    try {
-      // Utilisation d'une fonction qui sera exécutée uniquement côté client
-      if (typeof window !== "undefined") {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const objectUrl = window.URL.createObjectURL(blob);
-
-        const link = document.createElement("a");
-        link.href = objectUrl;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(objectUrl);
-      }
-    } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
-      toast.error("Erreur lors du téléchargement du fichier");
-    }
-  };
-
   return (
     <ContentLayout title="Nouvelle évaluation">
       {showUploadAnimation && (
@@ -468,7 +446,7 @@ export default function CreateEvaluationPage() {
                       Création en cours...
                     </>
                   ) : (
-                    "Créer l&apos;évaluation"
+                    "Créer l'évaluation"
                   )}
                 </Button>
               </div>
