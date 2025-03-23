@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Role } from "@/types";
 import { StudentDashboard } from "@/components/dashboard/student-dashboard";
 import { ProfessorDashboard } from "@/components/dashboard/professor-dashboard";
-import { AdminDashboard } from "@/components/dashboard/admin-dashboard";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -33,8 +32,6 @@ export default function DashboardPage() {
       return <StudentDashboard data={dashboardData} />;
     case Role.PROFESSOR:
       return <ProfessorDashboard data={dashboardData} />;
-    case Role.ADMIN:
-      return <AdminDashboard data={dashboardData as any} />;
     default:
       return (
         <ContentLayout title="Tableau de bord">
