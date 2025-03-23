@@ -38,10 +38,8 @@ import {
 } from "@/types/entities";
 import FileUpload from "@/components/file-upload";
 import { toast } from "sonner";
-import Lottie from "lottie-react";
-import uploadAnimation from "@/../public/animations/upload.json";
-import ocrAnimation from "@/../public/animations/ocr.json";
 import { downloadFile } from "@/utils/file-helpers";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 export default function SubmitEvaluationPage() {
   const params = useParams();
@@ -169,10 +167,13 @@ export default function SubmitEvaluationPage() {
       {showUploadAnimation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-12 max-w-md w-full">
-            <Lottie
-              animationData={uploadAnimation}
-              loop={true}
-              style={{ width: 250, height: 250, margin: "0 auto" }}
+            <Player
+              autoplay
+              loop
+              src={
+                "https://lottie.host/5eb45379-1352-4329-9e4d-c6123fec9d85/nkLcWCg3A3.json"
+              }
+              style={{ height: "50%", width: "50%" }}
             />
             <p className="text-center text-lg font-medium mt-4">
               Dépôt en cours...
@@ -184,10 +185,13 @@ export default function SubmitEvaluationPage() {
       {submission?.isCorrecting && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-12 max-w-md w-full">
-            <Lottie
-              animationData={ocrAnimation}
-              loop={true}
-              style={{ width: 250, height: 250, margin: "0 auto" }}
+            <Player
+              autoplay
+              loop
+              src={
+                "https://lottie.host/c9e9dae2-3bbf-485a-86ab-d4da15462536/U0GRLjtp7C.json"
+              }
+              style={{ width: 500, height: 200, margin: "0 auto" }}
             />
             <p className="text-center text-lg font-medium mt-4">
               Votre travail est en cours de correction...
