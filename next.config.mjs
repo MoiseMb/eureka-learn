@@ -17,7 +17,7 @@ const nextConfig = {
   // Disable static optimization for dynamic routes
   output: 'standalone',
   experimental: {
-    appDir: true,
+    serverActions: true
   }
 };
 

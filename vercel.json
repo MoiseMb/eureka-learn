@@ -12,5 +12,11 @@
       "NEXT_DISABLE_PRERENDER": "true",
       "NEXT_LINT": "false"
     }
+  },
+  "regions": ["iad1"],
+  "functions": {
+    "src/app/**/*": {
+      "runtime": "edge"
+    }
   }
 }
