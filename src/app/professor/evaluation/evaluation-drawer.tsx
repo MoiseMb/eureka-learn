@@ -27,8 +27,7 @@ import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { downloadFile } from "@/utils/file-helpers";
-import Lottie from "lottie-react";
-import ocrAnimation from "@/../public/animations/ocr.json";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 interface EvaluationDrawerProps {
   evaluation: Subject;
@@ -109,10 +108,13 @@ export function EvaluationDrawer({
                 {evaluation.isCorrecting && (
                   <Card className="overflow-hidden border-none shadow-sm">
                     <div className="p-4 bg-blue-50">
-                      <Lottie
-                        animationData={ocrAnimation}
-                        loop={true}
-                        className="w-full h-32"
+                      <Player
+                        autoplay
+                        loop
+                        src={
+                          "https://lottie.host/c9e9dae2-3bbf-485a-86ab-d4da15462536/U0GRLjtp7C.json"
+                        }
+                        style={{ height: "70%", width: "50%" }}
                       />
                       <p className="text-center text-blue-700 font-medium mt-2">
                         L'IA analyse actuellement le sujet...

@@ -34,9 +34,8 @@ import FileUpload from "@/components/file-upload";
 import { motion } from "framer-motion";
 import { Book, FileText, Clock, School } from "lucide-react";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
-import Lottie from "lottie-react";
-import uploadAnimation from "@/../public/animations/upload.json";
 import { useRouter } from "next/navigation";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 export default function CreateEvaluationPage() {
   const [formData, setFormData] = useState({
@@ -115,10 +114,13 @@ export default function CreateEvaluationPage() {
       {showUploadAnimation && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-12 max-w-md w-full">
-            <Lottie
-              animationData={uploadAnimation}
-              loop={true}
-              style={{ width: 250, height: 250, margin: "0 auto" }}
+            <Player
+              autoplay
+              loop
+              src={
+                "https://lottie.host/5eb45379-1352-4329-9e4d-c6123fec9d85/nkLcWCg3A3.json"
+              }
+              style={{ height: "50%", width: "50%" }}
             />
             <p className="text-center text-xl font-semibold mt-4">
               Création de l&apos;évaluation en cours...

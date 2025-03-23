@@ -15,14 +15,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
   Users,
-  FileText,
   Download,
-  X,
   Eye,
   Clock,
   CheckCircle,
   XCircle,
-  GraduationCap,
   BookOpen,
   Info,
   School,
@@ -35,9 +32,8 @@ import { FileViewerDialog } from "@/components/file-viewer-dialog";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import Lottie from "lottie-react";
-import ocrAnimation from "@/../public/animations/ocr.json";
 import { downloadFile } from "@/utils/file-helpers";
+import { Player } from "@lottiefiles/react-lottie-player";
 
 interface EvaluationDrawerProps {
   evaluation: Subject | null;
@@ -245,9 +241,12 @@ export function EvaluationDrawer({
                     className={`rounded-lg ${status.bgColor} p-4 ${status.color} flex-col items-center justify-center gap-2`}
                   >
                     {submission?.isCorrecting && (
-                      <Lottie
-                        animationData={ocrAnimation}
-                        loop={true}
+                      <Player
+                        autoplay
+                        loop
+                        src={
+                          "https://lottie.host/c9e9dae2-3bbf-485a-86ab-d4da15462536/U0GRLjtp7C.json"
+                        }
                         style={{ width: 500, height: 200, margin: "0 auto" }}
                       />
                     )}
