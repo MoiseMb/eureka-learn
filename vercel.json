@@ -16,7 +16,7 @@
   "regions": ["iad1"],
   "functions": {
     "src/app/**/*": {
-      "runtime": "edge"
+      "runtime": "@vercel/node@latest"
     }
   }
 }
