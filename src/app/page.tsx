@@ -28,6 +28,7 @@ import Image from "next/image";
 import girlCodeImage from "@/../public/images/girlCode.jpg";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
+import { useLottie } from "lottie-react";
 
 enum EvaluationType {
   POO_JAVA = "POO_JAVA",
@@ -49,32 +50,60 @@ const evaluationTypeConfig = {
     icon: Terminal,
     color: "from-blue-500 to-cyan-500",
     label: "Langage C",
-    animation: "/animations/c.json"
+    animation: "/animations/c-animation.json"
   },
   [EvaluationType.SQL]: {
     icon: Database,
     color: "from-indigo-500 to-purple-500",
     label: "SQL",
-    animation: "/animations/database.json"
+    animation: "/animations/database-animation.json"
   },
   [EvaluationType.PYTHON]: {
     icon: FileCode2,
     color: "from-yellow-500 to-amber-500",
     label: "Python",
-    animation: "/animations/python.json"
+    animation: "/animations/python-animation.json"
   },
   [EvaluationType.ALGORITHMS]: {
     icon: Binary,
     color: "from-green-500 to-emerald-500",
     label: "Algorithmes",
-    animation: "/animations/algorithm.json"
+    animation: "/animations/algorithm-animation.json"
   },
   [EvaluationType.DATA_STRUCTURES]: {
     icon: Blocks,
     color: "from-pink-500 to-rose-500",
     label: "Structures de Données",
-    animation: "/animations/data-structure.json"
+    animation: "/animations/data-structure-animation.json"
   }
+};
+
+// Custom hook for loading Lottie animations
+const useLottieAnimation = (path: string) => {
+  const [animation, setAnimation] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    fetch(path)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load animation: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setAnimation(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(`Error loading animation from ${path}:`, err);
+        setError(err);
+        setLoading(false);
+      });
+  }, [path]);
+
+  return { animation, loading, error };
 };
 
 function App() {
@@ -86,6 +115,8 @@ function App() {
     EvaluationType.SQL
   );
   const [isHovering, setIsHovering] = useState(false);
+  const [animations, setAnimations] = useState<Record<string, any>>({});
+  const [isLoading, setIsLoading] = useState(true);
 
   const [heroRef, heroInView] = useInView({
     triggerOnce: true,
@@ -107,6 +138,53 @@ function App() {
   // Effet pour éviter l'hydration mismatch avec le thème
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const loadAnimations = async () => {
+      setIsLoading(true);
+
+      for (const type of Object.values(EvaluationType)) {
+        try {
+          const config = evaluationTypeConfig[type];
+          if (!config?.animation) continue;
+
+          const response = await fetch(config.animation);
+          if (!response.ok) {
+            console.warn(
+              `Failed to load ${type} animation: ${response.statusText}`
+            );
+            continue;
+          }
+
+          const animationData = await response.json();
+
+          // Validate animation data structure
+          if (!animationData?.layers || !Array.isArray(animationData.layers)) {
+            console.warn(`Invalid animation data structure for ${type}`);
+            continue;
+          }
+
+          const animation = useLottie({
+            animationData: document.getElementById(`${type}-animation`)!,
+            renderer: "svg",
+            loop: true,
+            autoplay: true
+          });
+
+          setAnimations((prev) => ({
+            ...prev,
+            [type]: animation
+          }));
+        } catch (error) {
+          console.warn(`Failed to load ${type} animation, skipping...`, error);
+        }
+      }
+
+      setIsLoading(false);
+    };
+
+    loadAnimations();
   }, []);
 
   // Animations
@@ -142,6 +220,18 @@ function App() {
       ? "bg-[#030712] text-white"
       : "bg-gray-50 text-gray-900";
   };
+
+  const { animation, loading } = useLottieAnimation(
+    evaluationTypeConfig[activeType]?.animation || ""
+  );
+
+  const options = {
+    animationData: animation,
+    loop: true,
+    autoplay: true
+  };
+
+  const { View } = useLottie(options);
 
   if (!mounted) {
     return null;
@@ -385,7 +475,6 @@ function App() {
                     : "border border-gray-200/50 bg-gradient-to-br from-white to-gray-100"
                 } p-8 overflow-hidden`}
               >
-                {/* Animation Lottie en fonction du type d'évaluation actif */}
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeType}
@@ -395,42 +484,7 @@ function App() {
                     transition={{ duration: 0.1 }}
                     className="w-full h-[400px] flex items-center justify-center"
                   >
-                    {activeType === EvaluationType.SQL && (
-                      <Lottie
-                        animationData={require("@/../public/animations/database-animation.json")}
-                        className="w-full max-w-lg"
-                      />
-                    )}
-                    {activeType === EvaluationType.POO_JAVA && (
-                      <Lottie
-                        animationData={require("@/../public/animations/java.json")}
-                        className="w-full max-w-lg"
-                      />
-                    )}
-                    {activeType === EvaluationType.C_LANGUAGE && (
-                      <Lottie
-                        animationData={require("@/../public/animations/c.json")}
-                        className="w-full max-w-lg"
-                      />
-                    )}
-                    {activeType === EvaluationType.PYTHON && (
-                      <Lottie
-                        animationData={require("@/../public/animations/python.json")}
-                        className="w-full max-w-lg"
-                      />
-                    )}
-                    {activeType === EvaluationType.ALGORITHMS && (
-                      <Lottie
-                        animationData={require("@/../public/animations/algorithm-animation.json")}
-                        className="w-full max-w-lg"
-                      />
-                    )}
-                    {activeType === EvaluationType.DATA_STRUCTURES && (
-                      <Lottie
-                        animationData={require("@/../public/animations/data-structure-animation.json")}
-                        className="w-full max-w-lg"
-                      />
-                    )}
+                    {!loading && animation && View}
                   </motion.div>
                 </AnimatePresence>
 
@@ -774,12 +828,6 @@ function App() {
                 : "bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100/50"
             } p-12 relative overflow-hidden`}
           >
-            <div className="absolute inset-0 overflow-hidden">
-              <Lottie
-                animationData={require("@/../public/animations/wave-animation.json")}
-                className="w-full h-full opacity-10"
-              />
-            </div>
             <div className="relative z-10 max-w-3xl mx-auto text-center">
               <h2
                 className={`text-3xl md:text-4xl font-bold mb-6 ${

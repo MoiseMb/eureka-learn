@@ -1,13 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config, { isServer }) => {
-    // Configuration pour traiter les fichiers JSON
+  webpack: (config) => {
+    // Ignorer les fichiers json dans /public/animations
     config.module.rules.push({
-      test: /\.json$/,
-      type: 'javascript/auto',
-      resolve: { fullySpecified: false }
+      test: /public\/animations\/.*\.json$/,
+      use: 'ignore-loader'
     });
-
     return config;
   },
   // Ajouter d'autres configurations Next.js si nécessaire
