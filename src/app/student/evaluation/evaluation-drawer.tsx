@@ -37,6 +37,7 @@ import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import Lottie from "lottie-react";
 import ocrAnimation from "@/../public/animations/ocr.json";
+import { downloadFile } from "@/utils/file-helpers";
 
 interface EvaluationDrawerProps {
   evaluation: Subject | null;
@@ -220,25 +221,12 @@ export function EvaluationDrawer({
                   <Button
                     variant="outline"
                     className="flex-1 flex items-center gap-2"
-                    onClick={async () => {
-                      try {
-                        const response = await fetch(evaluation.fileUrl);
-                        const blob = await response.blob();
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement("a");
-                        link.href = url;
-                        link.download = `${
-                          evaluation.title
-                        }.${evaluation.type.toLowerCase()}`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                      } catch (error) {
-                        console.error("Erreur lors du téléchargement:", error);
-                        toast.error("Erreur lors du téléchargement du fichier");
-                      }
-                    }}
+                    onClick={() =>
+                      downloadFile(
+                        evaluation.fileUrl,
+                        `${evaluation.title}.${evaluation.type.toLowerCase()}`
+                      )
+                    }
                   >
                     <Download className="h-4 w-4" />
                     Télécharger

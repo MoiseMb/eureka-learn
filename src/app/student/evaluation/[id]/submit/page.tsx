@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import Lottie from "lottie-react";
 import uploadAnimation from "@/../public/animations/upload.json";
 import ocrAnimation from "@/../public/animations/ocr.json";
+import { downloadFile } from "@/utils/file-helpers";
 
 export default function SubmitEvaluationPage() {
   const params = useParams();
@@ -271,25 +272,12 @@ export default function SubmitEvaluationPage() {
               <Button
                 variant="outline"
                 className="flex items-center gap-2"
-                onClick={async () => {
-                  try {
-                    const response = await fetch(evaluation.fileUrl);
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.download = `${
-                      evaluation.title
-                    }.${evaluation.type.toLowerCase()}`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(url);
-                  } catch (error) {
-                    console.error("Erreur lors du téléchargement:", error);
-                    toast.error("Erreur lors du téléchargement du fichier");
-                  }
-                }}
+                onClick={() =>
+                  downloadFile(
+                    evaluation.fileUrl,
+                    `${evaluation.title}.${evaluation.type.toLowerCase()}`
+                  )
+                }
               >
                 <Download className="h-4 w-4" />
                 Télécharger le sujet

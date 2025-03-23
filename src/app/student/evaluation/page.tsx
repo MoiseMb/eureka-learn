@@ -44,6 +44,7 @@ import { EvaluationDrawer } from "./evaluation-drawer";
 import React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { downloadFile } from "@/utils/file-helpers";
 
 export default function StudentEvaluationListPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -142,6 +143,17 @@ export default function StudentEvaluationListPage() {
 
     return matchesSearch && matchesType && matchesStatus;
   });
+
+  const handleDownload = async (evaluation: any) => {
+    try {
+      await downloadFile(
+        evaluation.fileUrl,
+        `${evaluation.title}.${evaluation.type.toLowerCase()}`
+      );
+    } catch (error) {
+      toast.error("Erreur lors du téléchargement du fichier");
+    }
+  };
 
   return (
     <ContentLayout title="Mes évaluations">
@@ -322,34 +334,7 @@ export default function StudentEvaluationListPage() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="flex items-center gap-2"
-                                  onClick={async () => {
-                                    try {
-                                      const response = await fetch(
-                                        evaluation.fileUrl
-                                      );
-                                      const blob = await response.blob();
-                                      const url =
-                                        window.URL.createObjectURL(blob);
-                                      const link = document.createElement("a");
-                                      link.href = url;
-                                      link.download = `${
-                                        evaluation.title
-                                      }.${evaluation.type.toLowerCase()}`;
-                                      document.body.appendChild(link);
-                                      link.click();
-                                      document.body.removeChild(link);
-                                      window.URL.revokeObjectURL(url);
-                                    } catch (error) {
-                                      console.error(
-                                        "Erreur lors du téléchargement:",
-                                        error
-                                      );
-                                      toast.error(
-                                        "Erreur lors du téléchargement du fichier"
-                                      );
-                                    }
-                                  }}
+                                  onClick={() => handleDownload(evaluation)}
                                 >
                                   <Download className="h-4 w-4" />
                                   Sujet

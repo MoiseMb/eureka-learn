@@ -32,7 +32,9 @@ import {
   ChevronLeft,
   ChevronRight,
   SlidersHorizontal,
-  X
+  X,
+  Eye,
+  GraduationCap
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -53,6 +55,7 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "@/hooks/use-mobile";
+import { downloadFile } from "@/utils/file-helpers";
 
 export default function EvaluationListPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -129,19 +132,12 @@ export default function EvaluationListPage() {
 
   const handleDownload = async (evaluation: any) => {
     try {
-      const response = await fetch(evaluation.fileUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${evaluation.title}.${evaluation.type.toLowerCase()}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      await downloadFile(
+        evaluation.fileUrl,
+        `${evaluation.title}.${evaluation.type.toLowerCase()}`
+      );
       toast.success("Téléchargement réussi");
     } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
       toast.error("Erreur lors du téléchargement du fichier");
     }
   };
@@ -429,7 +425,20 @@ export default function EvaluationListPage() {
                               className="text-primary hover:text-primary"
                               onClick={() => setSelectedEvaluation(evaluation)}
                             >
-                              Voir les détails
+                              <Eye className="h-4 w-4 mr-2" />
+                              Voir
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                router.push(
+                                  `/professor/evaluation/${evaluation.id}/grades`
+                                )
+                              }
+                            >
+                              <GraduationCap className="h-4 w-4 mr-2" />
+                              Notes
                             </Button>
                             <div className="flex gap-1">
                               <Button

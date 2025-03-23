@@ -62,36 +62,42 @@ export const subjectTypeConfig = {
 export const evaluationTypeConfig = {
     POO_JAVA: {
         label: "POO Java",
+        shortLabel: "Java",
         icon: Code2,
         color: "text-red-500",
         description: "Programmation Orientée Objet en Java"
     },
     C_LANGUAGE: {
         label: "Langage C",
+        shortLabel: "C",
         icon: Terminal,
         color: "text-blue-500",
         description: "Programmation en C"
     },
     SQL: {
         label: "SQL",
+        shortLabel: "SQL",
         icon: Database,
         color: "text-green-500",
         description: "Bases de données SQL"
     },
     PYTHON: {
         label: "Python",
+        shortLabel: "Python",
         icon: FileCode2,
         color: "text-yellow-500",
         description: "Programmation Python"
     },
     ALGORITHMS: {
         label: "Algorithmes",
+        shortLabel: "Algo",
         icon: Binary,
         color: "text-purple-500",
         description: "Conception d'algorithmes"
     },
     DATA_STRUCTURES: {
         label: "Structures de données",
+        shortLabel: "Struct",
         icon: Blocks,
         color: "text-orange-500",
         description: "Structures de données avancées"
@@ -119,6 +125,7 @@ export type Subject = {
     title: string;
     description?: string;
     fileUrl: string;
+    correctionFileUrl?: string;
     startDate: Date;
     endDate: Date;
     evaluationType: EvaluationType;
@@ -126,6 +133,8 @@ export type Subject = {
     type: SubjectType;
     teacherId: number;
     createdAt: Date;
+    isCorrecting: boolean;
+    isCorrected: boolean;
     classroomId: number;
     classroom: Classroom;
     updatedAt: Date;
@@ -164,4 +173,35 @@ export type Classroom = {
     students?: User[];
     teacher?: User | null;
     teacherId?: number | null;
-} 
+}
+
+export type StudentGradesResponse = {
+    subject: {
+        id: number;
+        title: string;
+        endDate: Date;
+        startDate: Date;
+        classroom: {
+            id: number;
+            name: string;
+        };
+    };
+    students: {
+        id: number;
+        firstName: string;
+        lastName: string;
+        email: string;
+        submission: {
+            id: number;
+            fileUrl: string;
+            submittedAt: Date;
+            isCorrecting: boolean;
+            isCorrected: boolean;
+            correction: {
+                score: number | null;
+                notes: string | null;
+                correctedAt: Date;
+            } | null;
+        } | null;
+    }[];
+}

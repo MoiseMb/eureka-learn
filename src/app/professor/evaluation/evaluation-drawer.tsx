@@ -16,7 +16,6 @@ import {
   Eye,
   Users,
   FileText,
-  Clock,
   GraduationCap,
   CheckCircle2
 } from "lucide-react";
@@ -26,6 +25,10 @@ import { evaluationTypeConfig, type Subject } from "@/types/entities";
 import { FileViewerDialog } from "@/components/file-viewer-dialog";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
+import { downloadFile } from "@/utils/file-helpers";
+import Lottie from "lottie-react";
+import ocrAnimation from "@/../public/animations/ocr.json";
 
 interface EvaluationDrawerProps {
   evaluation: Subject;
@@ -39,28 +42,22 @@ export function EvaluationDrawer({
   onClose
 }: EvaluationDrawerProps) {
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const router = useRouter();
 
   if (!evaluation) return null;
 
   const config = evaluationTypeConfig[evaluation.evaluationType];
+  const submissionCount = evaluation.submissions?.length ?? 0;
+  const correctedCount =
+    evaluation.submissions?.filter((s) => s.isCorrected).length ?? 0;
 
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(evaluation.fileUrl);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${evaluation.title}.${evaluation.type.toLowerCase()}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      toast.success("Téléchargement réussi");
-    } catch (error) {
-      console.error("Erreur lors du téléchargement:", error);
+  const handleDownload = () => {
+    downloadFile(
+      evaluation.fileUrl,
+      `${evaluation.title}.${evaluation.type.toLowerCase()}`
+    ).catch(() => {
       toast.error("Erreur lors du téléchargement du fichier");
-    }
+    });
   };
 
   return (
@@ -70,104 +67,146 @@ export function EvaluationDrawer({
           side="right"
           className="w-[600px] sm:w-[540px] p-0 bg-gradient-to-br from-white to-slate-50 my-6 ml-6 mr-4 rounded-xl shadow-2xl"
         >
-          <SheetHeader className="p-6 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-xl w-full">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <FileText className="h-8 w-8" />
-                <h2 className="text-2xl font-bold">{evaluation.title}</h2>
-              </div>
-              <Badge
-                variant="secondary"
-                className="bg-white/20 text-white border-none"
-              >
-                {config.label}
-              </Badge>
-            </div>
-          </SheetHeader>
-
-          <ScrollArea className="h-[calc(100vh-16rem)] p-6">
-            <div className="space-y-8">
-              {/* Status Card */}
-              <Card className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-none">
+          <div className="h-full flex flex-col">
+            <SheetHeader className="p-6 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-t-xl">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  <span className="font-medium text-emerald-700">
-                    Évaluation en cours
-                  </span>
+                  <div className="p-2 bg-white/10 rounded-lg">
+                    <FileText className="h-6 w-6" />
+                  </div>
+                  <h2 className="text-2xl font-bold">{evaluation.title}</h2>
                 </div>
-              </Card>
+                <Badge
+                  variant="secondary"
+                  className="bg-white/10 text-white border-none hover:bg-white/20"
+                >
+                  {config.label}
+                </Badge>
+              </div>
+            </SheetHeader>
 
-              {/* Info Cards */}
-              <div className="grid grid-cols-2 gap-4">
-                <Card className="p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-blue-100">
-                      <Calendar className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Date</p>
-                      <p className="font-medium">
-                        {format(
-                          new Date(evaluation.startDate),
-                          "dd MMMM yyyy",
-                          {
-                            locale: fr
-                          }
-                        )}
-                      </p>
+            <ScrollArea className="flex-1 p-6">
+              <div className="space-y-6">
+                {/* Status Card */}
+                <Card className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-none shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-emerald-100">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-emerald-700">
+                          État de l'évaluation
+                        </p>
+                        <p className="text-sm text-emerald-600">
+                          {correctedCount}/{submissionCount} copies corrigées
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </Card>
 
-                <Card className="p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-full bg-purple-100">
-                      <Users className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Classe</p>
-                      <p className="font-medium">
-                        {evaluation.classroom?.name}
+                {evaluation.isCorrecting && (
+                  <Card className="overflow-hidden border-none shadow-sm">
+                    <div className="p-4 bg-blue-50">
+                      <Lottie
+                        animationData={ocrAnimation}
+                        loop={true}
+                        className="w-full h-32"
+                      />
+                      <p className="text-center text-blue-700 font-medium mt-2">
+                        L'IA analyse actuellement le sujet...
                       </p>
                     </div>
-                  </div>
+                  </Card>
+                )}
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-blue-50">
+                        <Calendar className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Date</p>
+                        <p className="font-medium">
+                          {format(
+                            new Date(evaluation.startDate),
+                            "dd MMMM yyyy",
+                            {
+                              locale: fr
+                            }
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-purple-50">
+                        <Users className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Classe</p>
+                        <p className="font-medium">
+                          {evaluation.classroom?.name}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+
+                <Card className="p-6 bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold mb-2">Description</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {evaluation.description}
+                  </p>
                 </Card>
               </div>
+            </ScrollArea>
 
-              {/* Description */}
-              <Card className="p-6 bg-white shadow-sm">
-                <h3 className="text-lg font-semibold mb-3">Description</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {evaluation.description}
-                </p>
-              </Card>
-
-              {/* File Actions */}
-              <div className="grid grid-cols-2 gap-4">
+            <div className="p-6 border-t bg-white/50 backdrop-blur-sm rounded-b-xl">
+              <div className="space-y-3">
                 <Button
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg shadow-blue-500/20"
-                  onClick={() => setIsViewerOpen(true)}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg shadow-blue-500/20"
+                  onClick={() =>
+                    router.push(`/professor/evaluation/${evaluation.id}/grades`)
+                  }
                 >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Visualiser
+                  <GraduationCap className="h-4 w-4 mr-2" />
+                  Accéder aux notes
                 </Button>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    variant="outline"
+                    className="bg-white hover:bg-gray-50/80"
+                    onClick={() => setIsViewerOpen(true)}
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Visualiser
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="bg-white hover:bg-gray-50/80"
+                    onClick={handleDownload}
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Télécharger
+                  </Button>
+                </div>
+
                 <Button
                   variant="outline"
-                  className="w-full border-2 hover:bg-slate-50"
-                  onClick={handleDownload}
+                  className="w-full bg-white hover:bg-gray-50/80"
+                  onClick={onClose}
                 >
-                  <Download className="h-4 w-4 mr-2" />
-                  Télécharger
+                  Fermer
                 </Button>
               </div>
             </div>
-          </ScrollArea>
-
-          <SheetFooter className="p-6 border-t">
-            <Button variant="outline" onClick={onClose} className="w-full">
-              Fermer
-            </Button>
-          </SheetFooter>
+          </div>
         </SheetContent>
       </Sheet>
 

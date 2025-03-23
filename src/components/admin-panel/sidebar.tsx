@@ -33,7 +33,7 @@ export function Sidebar() {
           variant="link"
           asChild
         >
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             {!isOpen && (
               <span className=" bg-blue-500 text-white  py-1 rounded  md:text-xl text-md px-2">
                 EL
