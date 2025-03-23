@@ -14,6 +14,11 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Disable static optimization for dynamic routes
+  output: 'standalone',
+  experimental: {
+    appDir: true,
+  }
 };
 
 export default nextConfig;
