@@ -173,7 +173,7 @@ export default function SubmitEvaluationPage() {
               src={
                 "https://lottie.host/5eb45379-1352-4329-9e4d-c6123fec9d85/nkLcWCg3A3.json"
               }
-              style={{ height: "50%", width: "50%" }}
+              style={{ height: "80%", width: "80%" }}
             />
             <p className="text-center text-lg font-medium mt-4">
               Dépôt en cours...

@@ -261,7 +261,7 @@ function CorrectionCard({
                   getScoreColor(correction.score)
                 )}
               >
-                {correction.score}/20
+                {correction.score.toFixed(2)}/20
               </span>
             </div>
           )}
