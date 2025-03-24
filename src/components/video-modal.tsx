@@ -8,10 +8,13 @@ import { cn } from "@/lib/utils";
 interface VideoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  videoId: string;
+  driveFileId: string;
 }
 
-export function VideoModal({ isOpen, onClose, videoId }: VideoModalProps) {
+export function VideoModal({ isOpen, onClose, driveFileId }: VideoModalProps) {
+  // Convertir l'URL Google Drive en URL d'intégration
+  const embedUrl = `https://drive.google.com/file/d/${driveFileId}/preview`;
+
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={onClose}>
       <DialogPrimitive.Portal>
@@ -23,8 +26,8 @@ export function VideoModal({ isOpen, onClose, videoId }: VideoModalProps) {
         >
           <div className="relative pt-[56.25%]">
             <iframe
-              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              src={embedUrl}
+              allow="autoplay"
               allowFullScreen
               className="absolute top-0 left-0 w-full h-full"
             />

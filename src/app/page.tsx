@@ -153,6 +153,9 @@ function App() {
       : "bg-gray-50 text-gray-900";
   };
 
+  // ID extrait de l'URL Google Drive
+  const driveFileId = "1Cn3lGFeZiKemAMHpr4Z2Y7y90Ph5Sszz";
+
   if (!mounted) {
     return null;
   }
@@ -886,7 +889,7 @@ function App() {
       <VideoModal
         isOpen={showVideoModal}
         onClose={() => setShowVideoModal(false)}
-        videoId="bO7KDgJ66bk"
+        driveFileId={driveFileId}
       />
     </div>
   );
