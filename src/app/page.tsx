@@ -32,6 +32,7 @@ import girlCodeImage from "@/../public/images/girlCode.jpg";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { Player } from "@lottiefiles/react-lottie-player";
+import { VideoModal } from "@/components/video-modal";
 
 enum EvaluationType {
   POO_JAVA = "POO_JAVA",
@@ -96,6 +97,7 @@ function App() {
     EvaluationType.SQL
   );
   const [isHovering, setIsHovering] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   const [heroRef, heroInView] = useInView({
     triggerOnce: true,
@@ -367,6 +369,7 @@ function App() {
                     ? "bg-white/5 backdrop-blur-xl text-white border border-white/10 hover:bg-white/10"
                     : "bg-gray-900/5 backdrop-blur-xl text-gray-900 border border-gray-900/10 hover:bg-gray-900/10"
                 } rounded-xl font-medium flex items-center justify-center transition-colors duration-200`}
+                onClick={() => setShowVideoModal(true)}
               >
                 <Code2 className="h-5 w-5 mr-2" />
                 Voir une Démo
@@ -879,6 +882,12 @@ function App() {
           </div>
         </div>
       </footer>
+
+      <VideoModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
+        videoId="bO7KDgJ66bk"
+      />
     </div>
   );
 }
