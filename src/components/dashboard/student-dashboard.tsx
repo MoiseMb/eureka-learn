@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import {
   Card,
@@ -379,29 +379,6 @@ export function StudentDashboard({ data }: any) {
                             </span>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center justify-between mt-auto">
-                        <Badge
-                          variant="outline"
-                          className={`${
-                            correction?.score >= 10
-                              ? "bg-green-50 text-green-700"
-                              : "bg-red-50 text-red-700"
-                          }`}
-                        >
-                          Note: {correction.score}/20
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            router.push(
-                              `/student/submissions/${correction.submissionId}`
-                            )
-                          }
-                        >
-                          Voir
-                        </Button>
                       </div>
                     </div>
                   );
