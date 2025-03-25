@@ -199,7 +199,7 @@ export default function EvaluationGradesView({
     try {
       await onSaveGrade(
         student.id,
-        student.submission.id,
+        student?.submission?.correction?.id || 0,
         editScore,
         editNotes
       );

@@ -71,6 +71,7 @@ export default function CreateEvaluationPage() {
 
     setIsSubmitting(true);
     setShowUploadAnimation(true);
+    console.log(formData);
 
     try {
       const formDataToSend = new FormData();
@@ -123,7 +124,7 @@ export default function CreateEvaluationPage() {
               src={
                 "https://lottie.host/5eb45379-1352-4329-9e4d-c6123fec9d85/nkLcWCg3A3.json"
               }
-              style={{ height: "50%", width: "50%" }}
+              style={{ height: "80%", width: "80%" }}
             />
             <p className="text-center text-xl font-semibold mt-4">
               Création de l&apos;évaluation en cours...

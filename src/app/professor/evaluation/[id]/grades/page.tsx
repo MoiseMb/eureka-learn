@@ -13,9 +13,7 @@ export default function MarksPage() {
     params.id as string
   );
 
-  const { mutateAsync: updateGrade } = useUpdateResource(
-    `submission/:submissionId/grade`
-  );
+  const { mutateAsync: updateGrade } = useUpdateResource(`correction`);
 
   const handleSaveGrade = async (
     studentId: number,
@@ -26,7 +24,8 @@ export default function MarksPage() {
     try {
       await updateGrade({
         id: submissionId,
-        data: { score, notes }
+        score,
+        notes
       });
     } catch (error) {
       throw error;
