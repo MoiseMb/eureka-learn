@@ -6,7 +6,8 @@ import {
     Database,
     FileCode2,
     Binary,
-    Blocks
+    Blocks,
+    LucideIcon
 } from "lucide-react";
 
 export enum Role {
@@ -24,37 +25,39 @@ export enum EvaluationType {
     DATA_STRUCTURES = "DATA_STRUCTURES"
 }
 
-export enum SubjectType {
-    PDF = "PDF",
-    TEXT = "TEXT",
-    MARKDOWN = "MARKDOWN"
-}
+export type SubjectType = "PDF" | "MARKDOWN" | "LATEX";
 
-export const subjectTypeConfig = {
+export const subjectTypeConfig: Record<
+    SubjectType,
+    {
+        label: string;
+        icon: LucideIcon;
+        color: string;
+        acceptedTypes: Record<string, string[]>;
+    }
+> = {
     PDF: {
-        label: "Document PDF",
+        label: "PDF",
         icon: FileText,
         color: "text-red-500",
         acceptedTypes: {
             "application/pdf": [".pdf"]
         }
     },
-    TEXT: {
-        label: "Document Texte",
+    MARKDOWN: {
+        label: "Markdown",
         icon: FileText,
         color: "text-blue-500",
         acceptedTypes: {
-            "text/plain": [".txt"],
-            "application/msword": [".doc", ".docx"],
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"]
+            "text/markdown": [".md", ".markdown"]
         }
     },
-    MARKDOWN: {
-        label: "Document Markdown",
-        icon: FileCode,
+    LATEX: {
+        label: "LateX",
+        icon: FileText,
         color: "text-green-500",
         acceptedTypes: {
-            "text/markdown": [".md", ".markdown"]
+            "text/x-tex": [".tex", ".latex"]
         }
     }
 };
@@ -198,6 +201,7 @@ export type StudentGradesResponse = {
             isCorrecting: boolean;
             isCorrected: boolean;
             correction: {
+                id: number;
                 score: number | null;
                 notes: string | null;
                 correctedAt: Date;
